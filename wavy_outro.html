@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wavy Wipe Outro</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap");
+
+      :root {
+        --bubble-size: 180px;
+        --animation-duration: 3.5s;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #00ff00; /* Green screen */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .bubble-wrapper {
+        width: var(--bubble-size);
+        height: var(--bubble-size);
+        position: relative;
+        opacity: 0;
+      }
+
+      .bubble-wrapper.animate {
+        animation: container-life var(--animation-duration) ease-in-out forwards;
+      }
+
+      .price-bubble {
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at 50% 120%, #f5f5f5, #ffffff 80%);
+        border-radius: 50%;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2),
+          inset 0 -4px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: #2c3e50;
+        position: relative;
+        opacity: 0;
+      }
+      .bubble-wrapper.animate .price-bubble {
+        animation: zoom-bounce-in 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)
+          forwards;
+      }
+
+      .site-name,
+      .price {
+        opacity: 0;
+      }
+
+      .bubble-wrapper.animate .site-name {
+        animation: text-zoom-in 0.5s ease-out 0.4s forwards,
+          text-zoom-out 0.3s ease-in 2.9s forwards;
+      }
+      .bubble-wrapper.animate .price {
+        animation: text-zoom-in 0.5s ease-out 0.5s forwards,
+          text-zoom-out 0.3s ease-in 2.9s forwards;
+      }
+
+      .site-name {
+        font-weight: 500;
+        font-size: 1.1rem;
+      }
+
+      .price {
+        font-weight: 700;
+        font-size: 2rem;
+        margin-top: 5px;
+      }
+
+      .wipe-circle {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #00ff00;
+        border-radius: 48% 52% 51% 49% / 58% 59% 41% 42%;
+        transform: scale(0);
+        z-index: 10;
+        pointer-events: none;
+        box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
+      }
+      .bubble-wrapper.animate .wipe-circle {
+        animation: wipe-out 0.5s ease-in 3s forwards;
+      }
+
+      @keyframes container-life {
+        0%,
+        100% {
+          opacity: 0;
+        }
+        1%,
+        99% {
+          opacity: 1;
+        }
+      }
+
+      @keyframes zoom-bounce-in {
+        0% {
+          transform: scale(0.2);
+          opacity: 0;
+        }
+        60% {
+          transform: scale(1.1);
+          opacity: 1;
+        }
+        80% {
+          transform: scale(0.95);
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      @keyframes wipe-out {
+        to {
+          transform: scale(1.5);
+        }
+      }
+
+      @keyframes text-zoom-in {
+        from {
+          opacity: 0;
+          transform: scale(0.5);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      @keyframes text-zoom-out {
+        to {
+          opacity: 0;
+          transform: scale(0.5);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bubble-wrapper">
+      <div class="price-bubble">
+        <span class="site-name">kayak.com</span>
+        <span class="price">$245</span>
+      </div>
+      <div class="wipe-circle"></div>
+    </div>
+
+    <script>
+      window.addEventListener("load", () => {
+        const wrapper = document.querySelector(".bubble-wrapper");
+
+        function playAnimation() {
+          wrapper.classList.remove("animate");
+          void wrapper.offsetWidth;
+          setTimeout(() => {
+            wrapper.classList.add("animate");
+          }, 100);
+        }
+
+        setInterval(playAnimation, 4000);
+      });
+    </script>
+  </body>
+</html>

@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/purohitdhairy67/Animations#readme",
   "dependencies": {
-    "puppeteer": "^19.0.0",
+    "puppeteer": "^24.29.1",
     "puppeteer-screen-recorder": "^3.0.6"
   }
 }

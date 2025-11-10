@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 const path = require("path");
 
-const filename = "hotel_sites.html";
+const filename = "simple_outro.html";
 const outputFilename = filename.replace(".html", ".mp4");
 
 (async () => {
@@ -12,19 +12,6 @@ const outputFilename = filename.replace(".html", ".mp4");
     waitUntil: "networkidle0",
   });
   await page.setViewport({ width: 1080, height: 1920 });
-  // Wait for the iPhone skin image to load
-  await page.evaluate(() => {
-    return new Promise((resolve) => {
-      const img = document.querySelector(".iphone-skin");
-      if (img.complete) {
-        resolve();
-      } else {
-        img.onload = resolve;
-        img.onerror = () => resolve(); // Proceed even if error
-      }
-    });
-  });
-
   const recorder = new PuppeteerScreenRecorder(page, {
     followNewTab: true,
     fps: 30,
@@ -35,7 +22,7 @@ const outputFilename = filename.replace(".html", ".mp4");
   await recorder.start(outputFilename);
 
   // Let animation run
-  await page.waitForTimeout(8000);
+  await new Promise(resolve => setTimeout(resolve, 8000));
 
   await recorder.stop();
   await browser.close();
