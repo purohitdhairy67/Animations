@@ -1,0 +1,26 @@
+{
+  "name": "animations",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Export.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "export": "node Export.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/purohitdhairy67/Animations.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/purohitdhairy67/Animations/issues"
+  },
+  "homepage": "https://github.com/purohitdhairy67/Animations#readme",
+  "dependencies": {
+    "puppeteer": "^19.0.0",
+    "puppeteer-screen-recorder": "^3.0.6"
+  }
+}

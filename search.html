@@ -20,7 +20,7 @@
 
       body {
         font-family: "Poppins", sans-serif;
-        background-color: #111;
+        background-color: #00ff00; /* Green screen for chroma key */
       }
 
       .video-container {
@@ -28,9 +28,7 @@
         width: 100vw;
         height: 100vh;
         margin: 0 auto;
-        background-image: url("https://i.imgur.com/KxT5k8N.jpg"); /* Your original image */
-        background-size: cover;
-        background-position: center;
+        background-color: #00ff00; /* Green screen for chroma key */
         overflow: hidden; /* Crucial for pop-ups animating in */
       }
 
@@ -40,7 +38,7 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: 495px;
+        width: 396px; /* Reduced from 495px */
         opacity: 0;
         transform-origin: center;
         transition: opacity var(--timing-fast) ease-in-out,
@@ -262,7 +260,7 @@
       }
 
       // Start the infinite loop
-      setInterval(runAnimationCycle, holdDuration + resetDelay + 5000); // Total time estimate
+      // setInterval(runAnimationCycle, holdDuration + resetDelay + 5000); // Total time estimate
       runAnimationCycle(); // Run the first cycle immediately
     </script>
   </body>
