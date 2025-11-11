@@ -1,8 +1,5 @@
-# Ignore node_modules directory
-node_modules/
+# dependencies
+/node_modules
 
-# Ignore OS generated files
-.DS_Store
-
-# Ignore videos or large files if needed
-Videos/*.mp4
+# videos
+*.mp4

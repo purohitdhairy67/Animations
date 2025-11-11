@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hotel Site Transition Animation</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
+
+      :root {
+        --timing-medium: 0.6s;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #00ff00; /* Green screen for chroma key */
+        min-height: 100vh;
+        display: flex; /* Changed to flex for centering */
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        perspective: 1200px; /* Add perspective for 3D effect */
+      }
+
+      .animation-container {
+        position: relative;
+        width: 364px;
+        height: 750px;
+        transform-style: preserve-3d;
+        perspective: 1200px;
+      }
+
+      .iphone-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        /* transform: scale(1.2); */ /* Scale up the whole thing */
+        transform-style: preserve-3d; /* Helps with 3D transforms */
+        transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
+        backface-visibility: hidden; /* Hide the back of the element during rotation */
+        will-change: transform; /* Optimize for upcoming animation */
+      }
+
+      .iphone-skin {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        pointer-events: none; /* Allows interaction with the screen */
+      }
+
+      .screen {
+        position: absolute;
+        top: 10px;
+        left: 14px;
+        right: 14px;
+        bottom: 10px;
+        background-color: #f0f2f5;
+        border-radius: 44px;
+        overflow: hidden;
+        z-index: 1;
+      }
+
+      .website {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1),
+          opacity 0.8s cubic-bezier(0.76, 0, 0.24, 1); /* Smoother timing */
+        padding: 20px;
+        color: #333;
+      }
+
+      #phone-2 {
+        transform: rotateY(180deg);
+      }
+
+      #site-1 {
+        z-index: 4; /* Will be behind site-2 during transition */
+      }
+
+      #site-2 {
+        /* transform: translateX(100%); */
+        z-index: 5; /* Will slide in on top of site-1 */
+      }
+
+      /* --- Site 1: LuxeStay (Elegant & Minimal) --- */
+      #site-1 {
+        background: #f8f9fa; /* Lighter, cleaner background */
+        color: #212529; /* Darker, more readable text */
+      }
+      #site-1 .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #dee2e6; /* Softer border */
+      }
+      #site-1 .logo {
+        font-weight: 700;
+        font-size: 1.1rem;
+        letter-spacing: 0.5px;
+      }
+      #site-1 .topbar .icons {
+        display: flex;
+        gap: 16px;
+        color: #495057;
+      }
+      #site-1 .icon svg {
+        width: 22px;
+        height: 22px;
+        stroke-width: 1.5;
+      }
+      #site-1 .pill-search {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #ffffff;
+        padding: 14px 16px;
+        border-radius: 999px; /* Fully rounded pill */
+        margin-top: 20px;
+        font-size: 0.9rem;
+        color: #6c757d;
+        border: 1px solid #e9ecef;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); /* Softer shadow */
+      }
+      #site-1 .pill-search svg {
+        width: 18px;
+        height: 18px;
+        color: #495057;
+      }
+      #site-1 .stats-row {
+        display: flex;
+        gap: 18px;
+        margin-top: 20px;
+        font-size: 0.8rem;
+        color: #6c757d;
+      }
+      #site-1 .section-heading {
+        margin-top: 24px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #adb5bd;
+      }
+      #site-1 .hotel-list {
+        margin-top: 14px;
+        display: grid;
+        gap: 14px;
+      }
+      #site-1 .hotel-item {
+        display: grid;
+        grid-template-columns: 100px 1fr;
+        gap: 14px;
+        background: #ffffff;
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid #e9ecef;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      }
+      #site-1 .thumb {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 14px;
+      }
+      #site-1 .meta {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      #site-1 .name {
+        font-weight: 600;
+        font-size: 1rem;
+        color: #212529;
+      }
+      #site-1 .sub {
+        font-size: 0.8rem;
+        color: #6c757d;
+      }
+      #site-1 .rating-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        font-size: 0.8rem;
+        color: #495057;
+      }
+      #site-1 .badge {
+        background: #e7f5ff; /* Softer, light blue badge */
+        color: #1971c2;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 0.7rem;
+        font-weight: 700;
+      }
+      #site-1 .price {
+        margin-top: auto; /* Pushes price to the bottom */
+        color: #212529;
+        font-weight: 700;
+        font-size: 1.05rem;
+      }
+      #site-1 .price span {
+        font-weight: 400;
+        font-size: 0.8rem;
+        color: #6c757d;
+      }
+
+      /* --- Site 2: StayFinder (Modern & Vibrant) --- */
+      #site-2 {
+        background-color: #ffffff;
+        color: #1a1a1a; /* Stronger base text color */
+      }
+      #site-2 .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #f0f0f0;
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+      #site-2 .topbar .logo {
+        color: #ff4500; /* Use the brand color */
+        font-size: 0.88rem; /* 20% smaller than 1.1rem */
+      }
+      #site-2 .topbar .bubble {
+        background: #ff4500;
+        color: #fff;
+        font-size: 0.6rem;
+        padding: 5px 10px;
+        border-radius: 999px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 700;
+      }
+      #site-2 .search-rect {
+        margin-top: 20px;
+        background: #f7f7f7;
+        border: 1px solid #f0f0f0;
+        border-radius: 12px;
+        padding: 14px;
+        color: #555;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        font-size: 0.95rem;
+      }
+      #site-2 .search-rect svg {
+        width: 20px;
+        height: 20px;
+        color: #ff4500;
+      }
+      #site-2 .headline-card {
+        margin-top: 20px;
+        border-radius: 18px;
+        overflow: hidden;
+        background: linear-gradient(135deg, #fff3e0, #ffffff);
+        border: 1px solid #ffe8cc;
+        box-shadow: 0 12px 28px rgba(255, 69, 0, 0.1);
+      }
+      #site-2 .headline-card .photo {
+        height: 110px;
+        background-size: cover;
+        background-position: center;
+      }
+      #site-2 .headline-card .copy {
+        padding: 16px;
+      }
+      #site-2 .headline-card .copy .title {
+        font-weight: 700;
+        font-size: 1rem;
+        color: #d93d00;
+      }
+      #site-2 .headline-card .copy .subtitle {
+        margin-top: 4px;
+        color: #555;
+        font-size: 0.85rem;
+      }
+      #site-2 .list-title {
+        margin-top: 24px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #aaa;
+      }
+      #site-2 .card {
+        margin-top: 14px;
+        border: 1px solid #f0f0f0;
+        border-radius: 18px;
+        overflow: hidden;
+        background: #ffffff;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+      }
+      #site-2 .photo {
+        height: 120px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+      }
+      #site-2 .badge {
+        position: absolute;
+        left: 12px;
+        bottom: 12px;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(5px);
+        color: #fff;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 0.7rem;
+        font-weight: 700;
+      }
+      #site-2 .info {
+        padding: 14px;
+        display: grid;
+        gap: 6px;
+      }
+      #site-2 .info .name {
+        font-weight: 600;
+        font-size: 1rem;
+      }
+      #site-2 .info .sub {
+        color: #666;
+        font-size: 0.85rem;
+      }
+      #site-2 .info .amenities {
+        margin-top: 4px;
+        display: flex;
+        gap: 12px;
+        font-size: 0.8rem;
+        color: #ff4500;
+        font-weight: 500;
+      }
+      #site-2 .info .amenities span {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      #site-2 .info .amenities svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      @keyframes scroll-up {
+        from {
+          transform: translateY(0);
+        }
+        to {
+          transform: translateY(-50%);
+        }
+      }
+
+      #site-2 .scroll-content.is-scrolling {
+        animation: scroll-up 8s linear infinite;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="animation-container">
+      <div class="iphone-container" id="phone-1">
+        <img
+          src="Assets/iphone-16-pro-max.png"
+          alt="iPhone 16 Pro Max skin"
+          class="iphone-skin"
+        />
+        <div class="screen">
+          <!-- Website 1 -->
+          <div id="site-1" class="website">
+            <div class="topbar">
+              <div class="logo">LuxeStay</div>
+              <div class="icons">
+                <span class="icon"
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M12 3v1" />
+                    <path d="M12 20v1" />
+                    <path d="M3 12h1" />
+                    <path d="M20 12h1" />
+                    <path d="m18.36 5.64-.7 .7" />
+                    <path d="m6.34 17.66-.7 .7" />
+                    <path d="m18.36 18.36-.7-.7" />
+                    <path d="m6.34 6.34-.7-.7" />
+                    <circle cx="12" cy="12" r="5" />
+                    <path d="M12 18a6 6 0 0 0 6-6h-3a3 3 0 0 1-3 3v3z" /></svg
+                ></span>
+                <span class="icon"
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <line x1="3" y1="18" x2="21" y2="18" /></svg
+                ></span>
+              </div>
+            </div>
+            <div class="pill-search">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <span class="placeholder">Search hotels, city...</span>
+            </div>
+            <div class="stats-row">
+              <span>Paris · Tonight · 2 guests</span>
+            </div>
+            <div class="section-heading">Featured stays</div>
+            <div class="hotel-list">
+              <div class="hotel-item">
+                <img
+                  class="thumb"
+                  src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=400&auto=format&fit=crop"
+                  alt="hotel"
+                />
+                <div class="meta">
+                  <div class="name">The Grand Budapest</div>
+                  <div class="sub">Zubrowka Old Town</div>
+                  <div class="rating-row">
+                    <span>⭐ 4.9 (2.1k)</span>
+                  </div>
+                  <div class="price">$189 <span>/ night</span></div>
+                </div>
+              </div>
+              <div class="hotel-item">
+                <img
+                  class="thumb"
+                  src="https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=400&auto=format&fit=crop"
+                  alt="hotel"
+                />
+                <div class="meta">
+                  <div class="name">Riviera Palace</div>
+                  <div class="sub">Nice Promenade</div>
+                  <div class="rating-row">
+                    <span class="badge">Member Price</span>
+                  </div>
+                  <div class="price">$142 <span>/ night</span></div>
+                </div>
+              </div>
+              <div class="hotel-item">
+                <img
+                  class="thumb"
+                  src="https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=400&auto=format&fit=crop"
+                  alt="hotel"
+                />
+                <div class="meta">
+                  <div class="name">Skyline Suites</div>
+                  <div class="sub">Singapore Marina Bay</div>
+                  <div class="rating-row">
+                    <span>⭐ 4.8 (1.4k)</span>
+                  </div>
+                  <div class="price">$220 <span>/ night</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="iphone-container" id="phone-2">
+        <img
+          src="Assets/iphone-16-pro-max.png"
+          alt="iPhone 16 Pro Max skin"
+          class="iphone-skin"
+        />
+        <div class="screen">
+          <!-- Website 2 -->
+          <div id="site-2" class="website">
+            <div class="scroll-content">
+              <div class="topbar">
+                <div class="logo">StayFinder</div>
+                <div class="bubble">Flash deal</div>
+              </div>
+              <div class="search-rect">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <span>Search for stays</span>
+              </div>
+              <div class="headline-card">
+                <div
+                  class="photo"
+                  style="
+                    background-image: url('https://images.unsplash.com/photo-1455587734955-081b22074882?q=80&w=800&auto=format&fit=crop');
+                  "
+                ></div>
+                <div class="copy">
+                  <div class="title">Weekend escape under $120</div>
+                  <div class="subtitle">
+                    48-hour sale on curated city breaks.
+                  </div>
+                </div>
+              </div>
+              <div class="list-title">Nearby deals</div>
+              <div class="card">
+                <div
+                  class="photo"
+                  style="
+                    background-image: url('https://images.unsplash.com/photo-1496417263034-38ec4f0b665a?q=80&w=800&auto=format&fit=crop');
+                  "
+                >
+                  <div class="badge">$79 / night</div>
+                </div>
+                <div class="info">
+                  <div class="name">City Center Inn</div>
+                  <div class="sub">⭐ 4.1 · 1.2k reviews</div>
+                  <div class="amenities">
+                    <span
+                      ><svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M18 6H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2Z"
+                        />
+                        <path d="M6 14h12" />
+                        <path d="M14 14h2" />
+                        <path
+                          d="M12 6c-2.5 0-5 2.5-5 5 0 .8.2 1.6.7 2.3.4.6.9 1.1 1.5 1.7"
+                        /></svg
+                      >24h desk</span
+                    >
+                    <span
+                      ><svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M17 8h1a4 4 0 1 1 0 8h-1" />
+                        <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" />
+                        <line x1="6" y1="2" x2="6" y2="4" />
+                        <line x1="10" y1="2" x2="10" y2="4" />
+                        <line x1="14" y1="2" x2="14" y2="4" /></svg
+                      >Breakfast</span
+                    >
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div
+                  class="photo"
+                  style="
+                    background-image: url('https://images.unsplash.com/photo-1470124182917-cc6e71b22ecc?q=80&w=800&auto=format&fit=crop');
+                  "
+                >
+                  <div class="badge">$55 / night</div>
+                </div>
+                <div class="info">
+                  <div class="name">Airport Motel</div>
+                  <div class="sub">⭐ 3.9 · 870 reviews</div>
+                  <div class="amenities">
+                    <span
+                      ><svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M19 17h2v-3h-2v-1a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v1H9v-1a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v1H2v3h2v-1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1h2v-1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1Z"
+                        />
+                        <path d="M12 12V6.5a2.5 2.5 0 0 0-5 0V12" /></svg
+                      >Shuttle</span
+                    >
+                    <span
+                      ><svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M5 12.55a11 11 0 0 1 14.08 0" />
+                        <path d="M1.42 9a16 16 0 0 1 21.16 0" />
+                        <path d="M8.53 16a6 6 0 0 1 6.95 0" />
+                        <line x1="12" y1="20" x2="12.01" y2="20" /></svg
+                      >Wi-Fi</span
+                    >
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div
+                  class="photo"
+                  style="
+                    background-image: url('https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=80&w=800&auto=format&fit=crop');
+                  "
+                >
+                  <div class="badge">$120 / night</div>
+                </div>
+                <div class="info">
+                  <div class="name">Seaside Resort</div>
+                  <div class="sub">⭐ 4.6 · 2.3k reviews</div>
+                  <div class="amenities">
+                    <span
+                      ><svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M22 12c-2.5 0-5 2.5-5 5s2.5 5 5 5" />
+                        <path d="M22 7c-2.5 0-5 2.5-5 5" />
+                        <path d="M2 17c2.5 0 5-2.5 5-5s-2.5-5-5-5" />
+                        <path d="M2 12c2.5 0 5-2.5 5-5" />
+                        <path
+                          d="M12 2a2.5 2.5 0 0 1 2.5 2.5c0 1.5-2.5 5-2.5 5s-2.5-3.5-2.5-5A2.5 2.5 0 0 1 12 2z"
+                        /></svg
+                      >Pool</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const phone1 = document.getElementById("phone-1");
+      const phone2 = document.getElementById("phone-2");
+
+      const transitionDelay = 4000; // ms
+
+      function animateTransition() {
+        setTimeout(() => {
+          phone1.style.transform = "rotateY(-180deg)";
+          phone2.style.transform = "rotateY(0deg)";
+          setTimeout(() => {
+            document
+              .querySelector("#site-2 .scroll-content")
+              .classList.add("is-scrolling");
+          }, 500); // Corresponds to animation duration
+        }, transitionDelay);
+      }
+
+      // Start the animation on page load
+      animateTransition();
+      // Dynamically size container to match image aspect ratio
+      const img = document.querySelector(".iphone-skin");
+      img.onload = () => {
+        const naturalWidth = img.naturalWidth;
+        const naturalHeight = img.naturalHeight;
+        const container = document.querySelector(".animation-container");
+        container.style.width = `${naturalWidth}px`;
+        container.style.height = `${naturalHeight}px`;
+
+        // Fit within a 1080x1920 viewport for video export
+        const viewportWidth = 1080;
+        const viewportHeight = 1920;
+        const widthScale = viewportWidth / naturalWidth;
+        const heightScale = viewportHeight / naturalHeight;
+        // Use 95% of the available space to have some margin
+        const scale = Math.min(widthScale, heightScale) * 0.95;
+        container.style.transform = `scale(${scale})`;
+
+        // Adjust screen positioning to match new dimensions
+        // Assuming screen offsets are proportional; adjust these values based on actual design
+        const screen = document.querySelector(".screen");
+        screen.style.top = `${10 * (naturalHeight / 750)}px`; // Scale offsets assuming original height 750
+        screen.style.left = `${14 * (naturalWidth / 364)}px`;
+        screen.style.right = `${14 * (naturalWidth / 364)}px`;
+        screen.style.bottom = `${10 * (naturalHeight / 750)}px`;
+        screen.style.borderRadius = `${44 * (naturalHeight / 750)}px`;
+      };
+    </script>
+  </body>
+</html>

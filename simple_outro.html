@@ -10,6 +10,7 @@
       :root {
         --bubble-size: 180px;
         --animation-duration: 3.5s;
+        --initial-animation-delay: 4s;
       }
 
       * {
@@ -20,7 +21,7 @@
 
       body {
         font-family: "Poppins", sans-serif;
-        background-color: #00ff00; /* Green screen */
+        background-color: #00ff00;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -36,7 +37,8 @@
       }
 
       .bubble-wrapper.animate {
-        animation: container-life var(--animation-duration) ease-in-out forwards;
+        animation: container-life var(--animation-duration) ease-in-out
+          var(--initial-animation-delay) forwards;
       }
 
       .price-bubble {
@@ -44,7 +46,8 @@
         height: 100%;
         background: radial-gradient(circle at 50% 120%, #f5f5f5, #ffffff 80%);
         border-radius: 50%;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), inset 0 -4px 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2),
+          inset 0 -4px 10px rgba(0, 0, 0, 0.1);
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -54,22 +57,31 @@
         opacity: 0;
       }
       .bubble-wrapper.animate .price-bubble {
-         animation-name: zoom-bounce-in, zoom-out;
-         animation-duration: 0.8s, 0.4s;
-         animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275), ease-in;
-         animation-delay: 0s, 3.1s;
-         animation-fill-mode: forwards;
+        animation-name: zoom-bounce-in, zoom-out;
+        animation-duration: 0.8s, 0.4s;
+        animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275),
+          ease-in;
+        animation-delay: calc(var(--initial-animation-delay) + 0s),
+          calc(var(--initial-animation-delay) + 3.1s);
+        animation-fill-mode: forwards;
       }
-      
-      .site-name, .price {
+
+      .site-name,
+      .price {
         opacity: 0;
       }
 
       .bubble-wrapper.animate .site-name {
-        animation: text-zoom-in 0.5s ease-out 0.4s forwards, text-zoom-out 0.3s ease-in 2.9s forwards;
+        animation: text-zoom-in 0.5s ease-out
+            calc(var(--initial-animation-delay) + 0.4s) forwards,
+          text-zoom-out 0.3s ease-in calc(var(--initial-animation-delay) + 2.9s)
+            forwards;
       }
       .bubble-wrapper.animate .price {
-        animation: text-zoom-in 0.5s ease-out 0.5s forwards, text-zoom-out 0.3s ease-in 2.9s forwards;
+        animation: text-zoom-in 0.5s ease-out
+            calc(var(--initial-animation-delay) + 0.5s) forwards,
+          text-zoom-out 0.3s ease-in calc(var(--initial-animation-delay) + 2.9s)
+            forwards;
       }
 
       .site-name {
@@ -84,37 +96,64 @@
       }
 
       @keyframes container-life {
-        0%, 100% { opacity: 0; }
-        1%, 99% { opacity: 1; }
+        0%,
+        100% {
+          opacity: 0;
+        }
+        1%,
+        99% {
+          opacity: 1;
+        }
       }
 
       @keyframes zoom-bounce-in {
-        0% { transform: scale(0.2); opacity: 0; }
-        60% { transform: scale(1.1); opacity: 1; }
-        80% { transform: scale(0.95); }
-        100% { transform: scale(1); opacity: 1; }
+        0% {
+          transform: scale(0.2);
+          opacity: 0;
+        }
+        60% {
+          transform: scale(1.1);
+          opacity: 1;
+        }
+        80% {
+          transform: scale(0.95);
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
       }
-      
+
       @keyframes zoom-out {
-        to { transform: scale(0.2); opacity: 0;}
+        to {
+          transform: scale(0.2);
+          opacity: 0;
+        }
       }
 
       @keyframes text-zoom-in {
-        from { opacity: 0; transform: scale(0.5); }
-        to { opacity: 1; transform: scale(1); }
+        from {
+          opacity: 0;
+          transform: scale(0.5);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
       }
       @keyframes text-zoom-out {
-        to { opacity: 0; transform: scale(0.5); }
+        to {
+          opacity: 0;
+          transform: scale(0.5);
+        }
       }
-
     </style>
   </head>
   <body>
-
     <div class="bubble-wrapper">
       <div class="price-bubble">
-        <span class="site-name">expedia.com</span>
-        <span class="price">$260</span>
+        <span class="site-name">bookhotel.com </span>
+        <span class="price">$430</span>
       </div>
     </div>
 
@@ -123,15 +162,15 @@
         const wrapper = document.querySelector(".bubble-wrapper");
 
         function playAnimation() {
-            wrapper.classList.remove("animate");
-            void wrapper.offsetWidth;
-            setTimeout(() => {
-              wrapper.classList.add("animate");
-            }, 100);
+          wrapper.classList.remove("animate");
+          void wrapper.offsetWidth;
+          setTimeout(() => {
+            wrapper.classList.add("animate");
+          }, 100);
         }
 
         playAnimation();
-        setInterval(playAnimation, 4000);
+        //setInterval(playAnimation, 4000);
       });
     </script>
   </body>

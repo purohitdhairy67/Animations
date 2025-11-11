@@ -207,7 +207,7 @@
       const rightIconEl = document.getElementById("right-search-icon");
       const searchBarEl = document.getElementById("search-bar");
 
-      const textToType = "booking a hotel online?";
+      const textToType = "best hotels near me";
       const typeSpeed = 80; // ms
       const holdDuration = 3000; // ms to hold the final chaotic scene
       const resetDelay = 1500; // ms before the loop restarts
@@ -261,7 +261,7 @@
 
       // Start the infinite loop
       // setInterval(runAnimationCycle, holdDuration + resetDelay + 5000); // Total time estimate
-      runAnimationCycle(); // Run the first cycle immediately
+      setTimeout(runAnimationCycle, 4000); // Run the first cycle after 4 seconds
     </script>
   </body>
 </html>

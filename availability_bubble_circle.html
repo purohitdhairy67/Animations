@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Availability Bubbles - 5 Animations</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap");
+
+      :root {
+        /* --- ANIMATION CONTROLS --- */
+
+        /* GENERAL */
+        --bubble-size: 120px;
+        --group-width-multiplier: 2.2; /* Adjusts gap between the two bubbles. >2 increases gap. */
+        --available-bubble-vertical-offset: 30px; /* How much higher the 'Available' bubble sits */
+
+        /* COLORS */
+        --available-bg: #27ae60;
+        --not-available-bg: #e74c3c;
+        --bubble-text-color: #fff;
+
+        /* TEXT POSITIONING */
+        --single-line-text-nudge: 10%;
+        --multi-line-text-nudge: 20%;
+
+        /* ANIMATION SPEED & TIMING */
+        --initial-animation-delay: 4s; /* Delay before any animation starts */
+        --main-pop-duration: 0.35s;
+        --text-fade-duration: 0.4s;
+
+        /* Delay before 'Available' bubble animation starts */
+        --available-start-delay: 0.6s;
+
+        /* Delay before 'Not Available' bubble animation starts */
+        --not-available-start-delay: 1s;
+        /* Delay between each piece of the bubble animating in */
+        --stagger-delay: 0.15s;
+
+        --animation-duration: 4s; /* How long the animation stays on screen before disappearing */
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #0000ff;
+        /* background-color: #000; */
+        /* background-color: #fff; */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .controls {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 15px 20px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        z-index: 100;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+        width: 280px;
+      }
+      .controls h3 {
+        margin: 10px 0 5px;
+        font-size: 14px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 4px;
+      }
+      .control-group {
+        margin-bottom: 8px;
+      }
+      .control-group label {
+        display: block;
+        margin-bottom: 3px;
+        color: #333;
+      }
+      .control-group input {
+        width: 100%;
+        padding: 4px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      .controls button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 15px;
+        background-color: #27ae60;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+      .controls button:hover {
+        background-color: #2ecc71;
+      }
+
+      .container {
+        display: flex;
+        gap: 40px;
+        perspective: 1000px;
+      }
+
+      .animation-group {
+        width: calc(var(--bubble-size) * var(--group-width-multiplier));
+        height: calc(var(--bubble-size) * 1.5);
+        position: relative;
+        opacity: 0;
+        animation: group-life var(--animation-duration) ease-in-out forwards;
+      }
+
+      /* Stagger the appearance of each animation set */
+      .animation-group:nth-child(1) {
+        animation-delay: calc(
+          var(--initial-animation-delay) + var(--stagger-delay) * 0
+        );
+      }
+      .animation-group:nth-child(2) {
+        animation-delay: calc(
+          var(--initial-animation-delay) + var(--stagger-delay) * 1
+        );
+      }
+      .animation-group:nth-child(3) {
+        animation-delay: calc(
+          var(--initial-animation-delay) + var(--stagger-delay) * 2
+        );
+      }
+      .animation-group:nth-child(4) {
+        animation-delay: calc(
+          var(--initial-animation-delay) + var(--stagger-delay) * 3
+        );
+      }
+      .animation-group:nth-child(5) {
+        animation-delay: calc(
+          var(--initial-animation-delay) + var(--stagger-delay) * 4
+        );
+      }
+
+      .thought-bubble {
+        width: var(--bubble-size);
+        height: var(--bubble-size);
+        position: absolute;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.1rem;
+        font-weight: 600;
+        filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.15));
+      }
+
+      .thought-bubble svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+      }
+
+      .thought-bubble svg path {
+        stroke: var(--bubble-stroke-color);
+        stroke-width: var(--bubble-stroke-width);
+        stroke-linejoin: round;
+        stroke-miterlimit: 10;
+      }
+
+      .thought-bubble span {
+        position: relative;
+        z-index: 2;
+        color: var(--bubble-text-color);
+        width: 100%;
+        text-align: center;
+      }
+
+      .thought-bubble.available span {
+        padding-bottom: var(--single-line-text-nudge);
+      }
+      .thought-bubble.not-available span {
+        padding-bottom: var(--multi-line-text-nudge);
+      }
+
+      .available {
+        left: 0;
+        bottom: var(
+          --available-bubble-vertical-offset
+        ); /* Staggered position */
+      }
+      .not-available {
+        right: 0;
+        bottom: 0;
+      }
+
+      .thought-bubble.available svg path {
+        fill: var(--available-bg);
+      }
+      .thought-bubble.not-available svg {
+        transform: scaleX(-1);
+      }
+      .thought-bubble.not-available svg path {
+        fill: var(--not-available-bg);
+      }
+
+      @keyframes group-life {
+        0%,
+        100% {
+          opacity: 0;
+        }
+        10%,
+        90% {
+          opacity: 1;
+        }
+      }
+
+      /* --- ANIMATION SET 1: SEQUENTIAL POP-IN --- */
+      .anim-1 .thought-bubble,
+      .anim-1 .thought-bubble span {
+        opacity: 0;
+        transform: scale(0);
+      }
+      .anim-1 .thought-bubble.available {
+        animation: pop-in-main var(--main-pop-duration) ease-out
+          calc(var(--initial-animation-delay) + var(--available-start-delay))
+          forwards;
+      }
+      .anim-1 .thought-bubble.available span {
+        animation: text-fade-in var(--text-fade-duration) ease-out
+          calc(
+            var(--initial-animation-delay) + var(--available-start-delay) +
+              var(--stagger-delay)
+          )
+          forwards;
+      }
+
+      .anim-1 .thought-bubble.not-available {
+        animation: pop-in-main var(--main-pop-duration) ease-out
+          calc(
+            var(--initial-animation-delay) + var(--not-available-start-delay)
+          )
+          forwards;
+      }
+      .anim-1 .thought-bubble.not-available span {
+        animation: text-fade-in var(--text-fade-duration) ease-out
+          calc(
+            var(--initial-animation-delay) + var(--not-available-start-delay) +
+              var(--stagger-delay)
+          )
+          forwards;
+      }
+
+      @keyframes pop-in-main {
+        0% {
+          transform: scale(0);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      @keyframes text-fade-in {
+        from {
+          opacity: 0;
+          transform: scale(0.5);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Animation 1: Pop-in Build -->
+      <div class="animation-group anim-1">
+        <div class="thought-bubble available">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M11.934 1.513c7.999 0.039 11.239 4.211 11.299 9.404 0.034 2.902 -1.836 5.407 -4.701 6.934 -1.397 0.989 0.266 4.226 1.597 5.054 0 0 -4.706 -0.321 -6.004 -3.637q-1.075 0.158 -2.209 0.159c-6.24 0 -11.281 -3.315 -11.281 -8.509S3.859 1.474 11.934 1.513z"
+            />
+          </svg>
+          <span>Available</span>
+        </div>
+        <div class="thought-bubble not-available">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M11.934 1.513c7.999 0.039 11.239 4.211 11.299 9.404 0.034 2.902 -1.836 5.407 -4.701 6.934 -1.397 0.989 0.266 4.226 1.597 5.054 0 0 -4.706 -0.321 -6.004 -3.637q-1.075 0.158 -2.209 0.159c-6.24 0 -11.281 -3.315 -11.281 -8.509S3.859 1.474 11.934 1.513z"
+            />
+          </svg>
+          <span>Not<br />Available</span>
+        </div>
+      </div>
+    </div>
+    <div class="controls" style="display: none">
+      <h3>General</h3>
+      <div class="control-group">
+        <label for="bubble-size">Bubble Size (px)</label>
+        <input
+          type="number"
+          id="bubble-size"
+          value="120"
+          step="1"
+          data-unit="px"
+        />
+      </div>
+      <div class="control-group">
+        <label for="group-width-multiplier">Bubble Gap</label>
+        <input
+          type="number"
+          id="group-width-multiplier"
+          value="2.2"
+          step="0.1"
+        />
+      </div>
+
+      <h3>Text Positioning</h3>
+      <div class="control-group">
+        <label for="single-line-text-nudge">Available Text Nudge (%)</label>
+        <input
+          type="number"
+          id="single-line-text-nudge"
+          value="10"
+          data-unit="%"
+        />
+      </div>
+      <div class="control-group">
+        <label for="multi-line-text-nudge">Not Available Text Nudge (%)</label>
+        <input
+          type="number"
+          id="multi-line-text-nudge"
+          value="20"
+          data-unit="%"
+        />
+      </div>
+
+      <h3>Animation Timings (s)</h3>
+      <div class="control-group">
+        <label for="main-pop-duration">Main Pop Duration</label>
+        <input
+          type="number"
+          id="main-pop-duration"
+          value="0.35"
+          step="0.1"
+          data-unit="s"
+        />
+      </div>
+      <div class="control-group">
+        <label for="available-start-delay">Available Start Delay</label>
+        <input
+          type="number"
+          id="available-start-delay"
+          value="0.6"
+          step="0.1"
+          data-unit="s"
+        />
+      </div>
+      <div class="control-group">
+        <label for="not-available-start-delay">Not Available Start Delay</label>
+        <input
+          type="number"
+          id="not-available-start-delay"
+          value="1"
+          step="0.1"
+          data-unit="s"
+        />
+      </div>
+      <div class="control-group">
+        <label for="stagger-delay">Stagger Delay</label>
+        <input
+          type="number"
+          id="stagger-delay"
+          value="0.15"
+          step="0.05"
+          data-unit="s"
+        />
+      </div>
+
+      <button id="apply-btn">Apply & Replay</button>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const applyBtn = document.getElementById("apply-btn");
+        const inputs = document.querySelectorAll(".controls input");
+        const container = document.querySelector(".container");
+
+        function applyControls() {
+          // 1. Update CSS variables from inputs
+          inputs.forEach((input) => {
+            const unit = input.dataset.unit || "";
+            document.documentElement.style.setProperty(
+              `--${input.id}`,
+              input.value + unit
+            );
+          });
+
+          // 2. Replay animation
+          const animationGroup = document.querySelector(".animation-group");
+          if (animationGroup) {
+            // Clone the node, remove the old one, and append the new one to restart the animation
+            const newGroup = animationGroup.cloneNode(true);
+            animationGroup.remove();
+            container.appendChild(newGroup);
+          }
+        }
+
+        applyBtn.addEventListener("click", applyControls);
+      });
+    </script>
+  </body>
+</html>

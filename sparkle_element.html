@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sparkle Animation</title>
+    <style>
+      body {
+        margin: 0;
+        height: 100vh;
+        background-color: #00ff00; /* Green screen for chroma key */
+        overflow: hidden;
+        position: relative;
+      }
+
+      .sparkle-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        rotate: 90deg;
+        width: 1px;
+        height: 1px;
+      }
+
+      .rotator {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 150px;
+        height: 150px;
+        transform-origin: 0 0;
+      }
+
+      .line {
+        position: absolute;
+        top: 0;
+        left: 25px; /* Creates space from the origin point */
+        height: 3px;
+        background: #000;
+        transform-origin: 0 50%; /* left center */
+        animation: sparkle-out 0.6s ease-out forwards;
+        animation-delay: 4s;
+      }
+
+      .rotator-1 {
+        transform: rotate(-15deg);
+      }
+      .rotator-2 {
+        transform: rotate(-45deg);
+      }
+      .rotator-3 {
+        transform: rotate(-75deg);
+      }
+
+      .rotator-1 .line {
+        width: 25px;
+      }
+      .rotator-2 .line {
+        width: 30px;
+        /* height: 4px; */
+      }
+      .rotator-3 .line {
+        width: 25px;
+      }
+
+      @keyframes sparkle-out {
+        0% {
+          transform: scaleX(0);
+        }
+        100% {
+          transform: scaleX(1);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sparkle-container">
+      <div class="rotator rotator-1">
+        <div class="line"></div>
+      </div>
+      <div class="rotator rotator-2">
+        <div class="line"></div>
+      </div>
+      <div class="rotator rotator-3">
+        <div class="line"></div>
+      </div>
+    </div>
+  </body>
+</html>
