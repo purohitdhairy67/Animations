@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hotel Notification Card</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #00ff00;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        padding: 20px;
+      }
+
+      /* --- NEW CHAT CARD STYLES --- */
+      .chat-showcase-container {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        opacity: 0;
+        animation: fadeIn 0.6s ease-out 1s forwards;
+      }
+
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      .chat-card {
+        background-color: #fff;
+        border: 1px solid #e5e7eb;
+        box-sizing: border-box;
+        width: 420px;
+        display: flex;
+        align-items: center;
+      }
+
+      .content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .avatar-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      /* Style 1: Classic & Refined */
+      .chat-card--style1 {
+        display: flex;
+        /* align-items: flex-start; */
+        padding: 10px 14px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+      .chat-card--style1 .avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        margin-right: 16px;
+      }
+      .chat-card--style1 .content .name {
+        font-weight: 600;
+        font-size: 16px;
+      }
+      .chat-card--style1 .content .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 4px;
+      }
+      .chat-card--style1 .content .time {
+        font-size: 12px;
+        color: #888;
+        white-space: nowrap;
+      }
+      .chat-card--style1 .content .chat-message {
+        font-size: 15px;
+        line-height: 1.6;
+        color: #333;
+        display: inline;
+      }
+      .chat-card--style1 .content .highlight-price {
+        font-weight: 600;
+        color: #007f61;
+        font-size: 15px;
+      }
+
+      /* Style 3: Inline Message */
+      .chat-card--style3 {
+        display: flex;
+        align-items: flex-start;
+        padding: 10px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+      .chat-card--style3 .avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        margin-right: 16px;
+        flex-shrink: 0;
+      }
+      .chat-card--style3 .content .name {
+        font-weight: 600;
+        font-size: 16px;
+        display: inline;
+        /* margin-right: 0.5em; */
+      }
+      .chat-card--style3 .content .chat-message {
+        font-size: 15px;
+        line-height: 1.6;
+        color: #333;
+        display: inline;
+      }
+      .chat-card--style3 .content .highlight-price {
+        font-weight: 600;
+        color: #007f61;
+        font-size: 15px;
+      }
+
+      /* Style 4: Video-Focused with Typing Animation */
+      .chat-card--style4 {
+        display: flex;
+        align-items: flex-start;
+        padding: 10px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+      .chat-card--style4 .avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        margin-right: 16px;
+        flex-shrink: 0;
+      }
+      .chat-card--style4 .content .name {
+        font-size: 14px;
+        color: #888;
+        /* margin-bottom: 4px; */
+      }
+      .chat-card--style4 .content .chat-message {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1a1a1a;
+        line-height: 1.5;
+        opacity: 0;
+        transform-origin: bottom left;
+        animation: offer-pop-in 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) 1.5s
+          forwards;
+      }
+      .chat-card--style4 .content .highlight-price {
+        color: #0f81c0;
+        font-weight: 700;
+      }
+
+      @keyframes offer-pop-in {
+        0% {
+          transform: scale(0.8);
+          opacity: 0;
+        }
+        90% {
+          transform: scale(1.05);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .price-section {
+        text-align: right;
+        padding-left: 0px;
+      }
+
+      .price {
+        font-size: 26px;
+        font-weight: 700;
+        color: #2d3748;
+        line-height: 1;
+      }
+
+      .per-night {
+        font-size: 12px;
+        color: #718096;
+        margin-top: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chat-showcase-container">
+      <div class="chat-card chat-card--style1">
+        <div class="avatar-container">
+          <img
+            src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=100&auto=format&fit=crop"
+            alt="Avatar"
+            class="avatar"
+          />
+        </div>
+        <div class="content">
+          <div class="header">
+            <div class="name">The Ocean Pearl</div>
+            <div class="time">2 min ago</div>
+          </div>
+          <div class="chat-message">
+            <span class="highlight-price">$57/night </span>for a quiet stay at
+            city center.
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

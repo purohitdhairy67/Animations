@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 const path = require("path");
 
-const filename = "sparkle_element.html";
+const filename = "notification_card.html";
 const outputFilename = filename.replace(".html", ".mp4");
 
 (async () => {
@@ -22,7 +22,7 @@ const outputFilename = filename.replace(".html", ".mp4");
   await recorder.start(outputFilename);
 
   // Let animation run
-  await new Promise(resolve => setTimeout(resolve, 8000));
+  await new Promise(resolve => setTimeout(resolve, 13000));
 
   await recorder.stop();
   await browser.close();
