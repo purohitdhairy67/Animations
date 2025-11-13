@@ -11,7 +11,7 @@ const outputFilename = filename.replace(".html", ".mp4");
   await page.goto(`file://${path.join(__dirname, filename)}`, {
     waitUntil: "networkidle0",
   });
-  await page.setViewport({ width: 1080, height: 1920 });
+  await page.setViewport({ width: 1920, height: 1080 });
   const recorder = new PuppeteerScreenRecorder(page, {
     followNewTab: true,
     fps: 30,
@@ -22,7 +22,7 @@ const outputFilename = filename.replace(".html", ".mp4");
   await recorder.start(outputFilename);
 
   // Let animation run
-  await new Promise(resolve => setTimeout(resolve, 13000));
+  await new Promise(resolve => setTimeout(resolve, 18000));
 
   await recorder.stop();
   await browser.close();
