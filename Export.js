@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 const path = require("path");
 
-const filename = "notification_card.html";
+const filename = "macbook.html";
 const outputFilename = filename.replace(".html", ".mp4");
 
 (async () => {
@@ -12,6 +12,20 @@ const outputFilename = filename.replace(".html", ".mp4");
     waitUntil: "networkidle0",
   });
   await page.setViewport({ width: 1920, height: 1080 });
+
+  // Wait for the Macbook skin image to load
+  await page.evaluate(() => {
+    return new Promise((resolve) => {
+      const img = document.querySelector(".macbook-img");
+      if (img.complete) {
+        resolve();
+      } else {
+        img.onload = resolve;
+        img.onerror = () => resolve(); // Proceed even if error
+      }
+    });
+  });
+
   const recorder = new PuppeteerScreenRecorder(page, {
     followNewTab: true,
     fps: 30,

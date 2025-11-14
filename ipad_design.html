@@ -9,6 +9,7 @@
       /* Custom global styles */
       body {
         font-family: "Manrope", sans-serif;
+        background-color: #00ff00;
       }
 
       @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
@@ -62,29 +63,6 @@
       }
     </style>
     <style>
-      #animated-form-container {
-        transition: left 0.5s ease-in-out, transform 0.5s ease-in-out;
-        opacity: 1;
-        will-change: left, transform;
-      }
-
-      #animated-form-container.animated {
-        left: -50%;
-        transform: translateX(-95%) scale(2);
-        z-index: 60;
-      }
-
-      #backdrop-blur-overlay {
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.5s ease-in-out;
-      }
-
-      #backdrop-blur-overlay.visible {
-        opacity: 1;
-        pointer-events: auto;
-      }
-
       .date-range-start {
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
@@ -96,9 +74,53 @@
       .date-in-range {
         border-radius: 0;
       }
+
+      /* iPad frame styles */
+      .ipad-container {
+        position: relative;
+        width: 1024px; 
+        height: 768px;
+        transform: scale(0.9);
+        transform-style: preserve-3d;
+      }
+
+      .ipad-skin {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        pointer-events: none;
+      }
+
+      .screen {
+        position: absolute;
+        top: 25px;
+        left: 25px;
+        right: 25px;
+        bottom: 25px;
+        background-color: #ffffff;
+        border-radius: 20px;
+        overflow: auto;
+        z-index: 1;
+      }
+
+      .screen #header {
+        position: absolute;
+      }
+      .screen #backdrop-blur-overlay {
+        position: absolute;
+      }
+      .screen #mobile-menu {
+        position: absolute;
+      }
     </style>
   </head>
-  <body class="bg-white antialiased">
+  <body class="bg-gray-200 antialiased" style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+    <div class="ipad-container">
+        <img src="Assets/iPad Body.png" alt="iPad Body" class="ipad-skin" />
+        <div class="screen">
     <div
       id="backdrop-blur-overlay"
       class="fixed inset-0 bg-black/20 backdrop-blur-sm"
@@ -141,7 +163,7 @@
           </a>
 
           <nav
-            class="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center space-x-6 text-sm font-medium"
+            class="flex absolute left-1/2 -translate-x-1/2 items-center space-x-6 text-sm font-medium"
           >
             <a
               href="#how-it-works"
@@ -160,7 +182,7 @@
             >
           </nav>
 
-          <div class="hidden md:flex items-center gap-3">
+          <div class="flex items-center gap-3">
             <button
               class="text-sm font-medium nav-link text-white hover:text-slate-200 transition-colors cursor-pointer"
             >
@@ -180,7 +202,7 @@
           </div>
 
           <!-- Mobile Menu Button -->
-          <div class="md:hidden">
+          <div class="hidden">
             <button
               id="mobile-menu-button"
               class="p-2 rounded-md text-white hover:bg-white/20"
@@ -312,9 +334,9 @@
         />
         <div class="absolute inset-0 bg-black/50"></div>
         <div
-          class="container mx-auto px-6 relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 py-16 flex flex-col md:flex-row items-center justify-between gap-10"
+          class="container mx-auto px-6 relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 py-16 flex flex-row items-center justify-between gap-10"
         >
-          <div class="flex-1 text-white max-w-2xl text-center md:text-left">
+          <div class="flex-1 text-white max-w-2xl text-left">
             <div class="mb-4">
               <h1
                 class="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight"
@@ -335,7 +357,7 @@
           </div>
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div
-              class="flex flex-col md:flex-row items-center justify-between gap-12"
+              class="flex flex-row items-center justify-between gap-12"
             >
               <div id="form-container" class="flex-shrink-0 w-full max-w-md">
                 <form
@@ -938,47 +960,18 @@
         });
       });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
     <script>
       window.addEventListener("load", () => {
         const formContainer = document.getElementById("form-container");
-        const backdropOverlay = document.getElementById(
-          "backdrop-blur-overlay"
-        );
-
-        setTimeout(() => {
-          if (formContainer && backdropOverlay) {
-            const rect = formContainer.getBoundingClientRect();
-
-            const animatedForm = formContainer.cloneNode(true);
-            animatedForm.id = "animated-form-container";
-            formContainer.style.visibility = "hidden";
-
-            document.body.appendChild(animatedForm);
-
-            animatedForm.style.position = "fixed";
-            animatedForm.style.top = rect.top + "px";
-            animatedForm.style.left = rect.left + "px";
-            animatedForm.style.width = rect.width + "px";
-            animatedForm.style.margin = "0";
-
-            backdropOverlay.classList.add("visible");
-
-            setupLocationInput(animatedForm);
-
-            setTimeout(() => {
-              animatedForm.classList.add("animated");
-            }, 10);
-
-            animatedForm.addEventListener(
-              "transitionend",
-              () => {
+        
+        const startAnimation = () => {
+            if (formContainer) {
+                formContainer.id = "animated-form-container";
                 animateCalendar(animateLocation);
-              },
-              { once: true }
-            );
-          }
-        }, 6000);
+            }
+        };
+
+        setTimeout(startAnimation, 1500); // Delay before starting animation
 
         const typewriter = (text, element, callback) => {
           let i = 0;
@@ -1015,21 +1008,16 @@
               }
 
               if (targetSuggestion) {
-                // Simulate hover effect
                 targetSuggestion.classList.add("suggestion-hover-automated");
 
                 setTimeout(() => {
-                  // Simulate click effect
                   targetSuggestion.classList.remove(
                     "suggestion-hover-automated"
                   );
-                  // targetSuggestion.classList.add("suggestion-clicked");
-
                   setTimeout(() => {
                     targetSuggestion.click();
-                    // The click handler already has a delay for hiding
-                  }, 100); // Duration for click effect
-                }, 400); // Duration for hover effect
+                  }, 100);
+                }, 400);
               }
             }, 500);
           });
