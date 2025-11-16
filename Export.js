@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 const path = require("path");
 
-const filename = "macbook.html";
+const filename = "bidmyroom_search.html";
 const outputFilename = filename.replace(".html", ".mp4");
 
 (async () => {
@@ -11,24 +11,24 @@ const outputFilename = filename.replace(".html", ".mp4");
   await page.goto(`file://${path.join(__dirname, filename)}`, {
     waitUntil: "networkidle0",
   });
-  await page.setViewport({ width: 1920, height: 1080 });
+  await page.setViewport({ width: 1000, height: 1080 });
 
-  // Wait for the Macbook skin image to load
-  await page.evaluate(() => {
-    return new Promise((resolve) => {
-      const img = document.querySelector(".macbook-img");
-      if (img.complete) {
-        resolve();
-      } else {
-        img.onload = resolve;
-        img.onerror = () => resolve(); // Proceed even if error
-      }
-    });
-  });
+  // // Wait for the Macbook skin image to load
+  // await page.evaluate(() => {
+  //   return new Promise((resolve) => {
+  //     const img = document.querySelector(".macbook-img");
+  //     if (img.complete) {
+  //       resolve();
+  //     } else {
+  //       img.onload = resolve;
+  //       img.onerror = () => resolve(); // Proceed even if error
+  //     }
+  //   });
+  // });
 
   const recorder = new PuppeteerScreenRecorder(page, {
     followNewTab: true,
-    fps: 30,
+    fps: 60,
     videoCrf: 23, // Quality (lower = better)
     videoPreset: "ultrafast",
     videoCodec: "libx264",
@@ -36,7 +36,7 @@ const outputFilename = filename.replace(".html", ".mp4");
   await recorder.start(outputFilename);
 
   // Let animation run
-  await new Promise(resolve => setTimeout(resolve, 18000));
+  await new Promise((resolve) => setTimeout(resolve, 18000));
 
   await recorder.stop();
   await browser.close();
