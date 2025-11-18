@@ -9,6 +9,27 @@
 
       :root {
         --timing-medium: 0.6s;
+        --ease-animation: cubic-bezier(0.83, 0, 0.17, 1);
+        --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+        /* Animation Durations */
+        --duration-phone-flip: 0.5s;
+        --duration-phone-shrink: 0.8s;
+        --duration-price-transition: 0.6s;
+        --duration-availability-transition: 0.6s;
+        --duration-doubt-bubble: 0.8s;
+        --duration-scroll-animation: 8s;
+        --duration-slot-pulse: 1.4s;
+        --duration-doubt-wobble: 1.4s;
+
+        /* Scale Values */
+        --scale-price-compare: 1.15;
+        --scale-price-emphasized: 1.12;
+        --scale-availability-card: 1.35;
+        --scale-phone-shrink: 0;
+        --scale-doubt-bubble-initial: 0;
+        --scale-doubt-bubble-visible: 1;
+        --scale-doubt-bubble-growing: 1.875; /* Was 2.5, reduced by 25% */
       }
 
       * {
@@ -44,9 +65,33 @@
         height: 100%;
         /* transform: scale(1.2); */ /* Scale up the whole thing */
         transform-style: preserve-3d; /* Helps with 3D transforms */
-        transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
+        transition: transform var(--duration-phone-flip) var(--ease-animation),
+          opacity var(--duration-phone-shrink) var(--ease-animation);
         backface-visibility: hidden; /* Hide the back of the element during rotation */
-        will-change: transform; /* Optimize for upcoming animation */
+        will-change: transform, opacity; /* Optimize for upcoming animation */
+      }
+
+      #phone-1.is-shrinking,
+      #phone-2.is-shrinking {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      #phone-1.is-shrinking {
+        transform: rotateY(-180deg) scale(var(--scale-phone-shrink));
+      }
+
+      #phone-2.is-shrinking {
+        transform: rotateY(0deg) scale(var(--scale-phone-shrink));
+      }
+
+      #phone-1.is-flipped {
+        transform: rotateY(-180deg);
+        transition-duration: var(--duration-phone-flip);
+      }
+      #phone-2.is-flipped {
+        transform: rotateY(0deg);
+        transition-duration: var(--duration-phone-flip);
       }
 
       .iphone-skin {
@@ -55,7 +100,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        z-index: 2;
+        z-index: 20; /* Ensure phone image is always above screen contents */
         pointer-events: none; /* Allows interaction with the screen */
       }
 
@@ -77,10 +122,378 @@
         left: 0;
         width: 100%;
         height: 100%;
-        transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1),
-          opacity 0.8s cubic-bezier(0.76, 0, 0.24, 1); /* Smoother timing */
-        padding: 20px;
+        transition: transform var(--duration-phone-shrink) var(--ease-animation),
+          opacity var(--duration-phone-shrink) var(--ease-animation); /* Smoother timing */
+        padding: 72px 20px 36px; /* extra space for status bar & home indicator */
         color: #333;
+      }
+
+      /* iPhone-style status bar (top) */
+      .status-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 25px 20px 15px; /* top padding lets part hide under phone skin */
+        font-size: 11px;
+        color: #fff;
+        background: #1f1f1f; /* dark mode style background */
+        border-radius: 0;
+        z-index: 10; /* Above website, below phone image */
+        pointer-events: none;
+      }
+
+      .status-bar .status-right {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .status-bar .signal,
+      .status-bar .wifi,
+      .status-bar .battery {
+        display: inline-block;
+      }
+
+      .status-bar .signal {
+        width: 14px;
+        height: 10px;
+        border-radius: 3px;
+        background: linear-gradient(
+          to right,
+          #bbb 30%,
+          #e0e0e0 60%,
+          #ffffff 100%
+        );
+      }
+
+      .status-bar .wifi {
+        width: 12px;
+        height: 10px;
+        border-radius: 50%;
+        border: 2px solid #f5f5f5;
+        border-top-color: transparent;
+        border-left-color: transparent;
+      }
+
+      .status-bar .battery {
+        width: 20px;
+        height: 10px;
+        border-radius: 3px;
+        border: 1.5px solid #f5f5f5;
+        position: relative;
+      }
+
+      .status-bar .battery::after {
+        content: "";
+        position: absolute;
+        right: -3px;
+        top: 2px;
+        width: 2px;
+        height: 6px;
+        border-radius: 1px;
+        background: #f5f5f5;
+      }
+
+      .status-bar .battery-level {
+        position: absolute;
+        top: 1px;
+        left: 1px;
+        right: 3px;
+        bottom: 1px;
+        border-radius: 2px;
+        background: #4caf50;
+      }
+
+      /* iPhone-style home indicator (bottom) */
+      .home-indicator {
+        position: absolute;
+        bottom: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90px;
+        height: 4px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 10; /* Above website, under phone skin */
+        pointer-events: none;
+      }
+
+      /* Overlay layer that lives around the phone to explain the rest of the VO:
+         "compare prices, check availability, and still wonder if you are getting the best deal." */
+      .overlay-layer {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 30; /* Above phone + screen contents */
+        font-size: 12px;
+      }
+
+      /* --- Price compare badges ("compare prices") --- */
+      .price-compare {
+        position: absolute;
+        right: -40px; /* Pull closer so it overlaps the phone */
+        top: 18%;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        opacity: 0;
+        transform: translateX(40px) scale(var(--scale-price-compare)); /* Slightly larger by default */
+        transform-origin: center;
+        transition: opacity var(--duration-price-transition)
+            var(--ease-animation),
+          transform var(--duration-price-transition) var(--ease-animation);
+        will-change: transform, opacity;
+      }
+
+      .price-badge {
+        min-width: 190px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+        background: #ffffff;
+        border: 1px solid #e5e5e5;
+        transition: transform 0.4s var(--ease-animation),
+          box-shadow 0.4s var(--ease-animation);
+      }
+
+      .price-badge .label {
+        font-weight: 600;
+        color: #111827;
+      }
+
+      .price-badge .meta {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #9ca3af;
+      }
+
+      .price-badge.bad {
+        border-color: #fee2e2;
+        background: #fef2f2;
+        color: #b91c1c;
+      }
+
+      .price-badge.best {
+        border-color: #bbf7d0;
+        background: #ecfdf3;
+        color: #166534;
+      }
+
+      .price-compare.is-visible {
+        opacity: 1;
+        transform: translateX(0) scale(var(--scale-price-compare));
+      }
+
+      .price-compare.is-emphasized .price-badge.best {
+        transform: scale(var(--scale-price-emphasized));
+        box-shadow: 0 12px 30px rgba(22, 101, 52, 0.35);
+      }
+
+      .price-compare.is-faded-out {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+
+      /* --- Availability card ("check availability") --- */
+      .availability-card {
+        position: absolute;
+        left: -40px; /* Pull closer so it overlaps the phone */
+        bottom: 14%;
+        width: 190px;
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+        opacity: 0;
+        transform: translateY(24px) scale(var(--scale-availability-card));
+        transform-origin: center;
+        transition: opacity var(--duration-availability-transition)
+            var(--ease-animation),
+          transform var(--duration-availability-transition)
+            var(--ease-animation);
+        will-change: transform, opacity;
+      }
+
+      .availability-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        font-size: 0.72rem;
+      }
+
+      .availability-header .label {
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #9ca3af;
+        font-weight: 600;
+      }
+
+      .availability-header .dates {
+        font-weight: 600;
+        color: #111827;
+      }
+
+      .availability-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4px;
+        margin-bottom: 8px;
+      }
+
+      .slot {
+        width: 20px;
+        height: 20px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.65rem;
+        font-weight: 600;
+        position: relative; /* For z-index stacking */
+      }
+
+      .slot.booked {
+        background: #fee2e2;
+        color: #b91c1c;
+      }
+
+      .slot.free {
+        background: #d1fae5;
+        color: #065f46;
+      }
+
+      .slot.free::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background-color: #d1fae5;
+        z-index: -1;
+        transform-origin: center;
+        opacity: 0;
+        pointer-events: none;
+        will-change: transform, opacity;
+      }
+
+      .availability-caption {
+        font-size: 0.7rem;
+        color: #6b7280;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .availability-caption span.highlight {
+        color: #b91c1c;
+        font-weight: 600;
+      }
+
+      .availability-card.is-visible {
+        opacity: 1;
+        transform: translateY(0) scale(var(--scale-availability-card));
+      }
+
+      @keyframes slot-pulse {
+        0% {
+          transform: scale(1);
+          opacity: 0.6;
+        }
+        100% {
+          transform: scale(2.5);
+          opacity: 0;
+        }
+      }
+
+      .availability-card.is-scanning .slot.free::before {
+        animation: slot-pulse var(--duration-slot-pulse) ease-out infinite;
+      }
+
+      .availability-card.is-faded-out {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      /* --- Doubt cloud ("still wonder if you are getting the best deal.") --- */
+      .doubt-bubble {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-50%)
+          scale(var(--scale-doubt-bubble-initial));
+        padding: 20px 32px;
+        border-radius: 999px;
+        background: #ffffff;
+        border: 2px solid #e5e7eb;
+        box-shadow: 0 20px 48px rgba(0, 0, 0, 0.25);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        opacity: 0;
+        transition: opacity var(--duration-doubt-bubble) var(--ease-animation),
+          transform var(--duration-doubt-bubble) var(--ease-animation);
+        will-change: transform, opacity;
+        font-size: 1.2rem;
+        color: #111827;
+        z-index: 50; /* Above everything */
+      }
+
+      .doubt-bubble .emoji {
+        font-size: 1.8rem;
+      }
+
+      .doubt-bubble .text {
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      .doubt-bubble.is-visible {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-50%)
+          scale(var(--scale-doubt-bubble-visible));
+      }
+
+      .doubt-bubble.is-growing {
+        transform: translateX(-50%) translateY(-50%)
+          scale(var(--scale-doubt-bubble-growing));
+        transition: transform calc(var(--duration-doubt-bubble) * 1.2)
+          var(--ease-animation);
+      }
+
+      @keyframes doubt-wobble {
+        0%,
+        100% {
+          transform: translateX(-50%) translateY(-50%)
+            scale(var(--scale-doubt-bubble-growing)) rotate(0deg);
+        }
+        25% {
+          transform: translateX(-52%) translateY(-52%)
+            scale(var(--scale-doubt-bubble-growing)) rotate(-2deg);
+        }
+        50% {
+          transform: translateX(-48%) translateY(-48%)
+            scale(var(--scale-doubt-bubble-growing)) rotate(1.5deg);
+        }
+        75% {
+          transform: translateX(-51%) translateY(-51%)
+            scale(var(--scale-doubt-bubble-growing)) rotate(-1deg);
+        }
+      }
+
+      .doubt-bubble.is-wobbling {
+        animation: doubt-wobble var(--duration-doubt-wobble) ease-in-out
+          infinite;
       }
 
       #phone-2 {
@@ -364,7 +777,13 @@
       }
 
       #site-2 .scroll-content.is-scrolling {
-        animation: scroll-up 8s linear infinite;
+        animation: scroll-up var(--duration-scroll-animation) linear infinite;
+      }
+
+      /* Give scrolling content some breathing room above the home indicator */
+      #site-2 .scroll-content {
+        padding-bottom: 40px;
+        will-change: transform;
       }
     </style>
   </head>
@@ -377,6 +796,16 @@
           class="iphone-skin"
         />
         <div class="screen">
+          <div class="status-bar">
+            <span class="time">9:41</span>
+            <div class="status-right">
+              <span class="signal"></span>
+              <span class="wifi"></span>
+              <span class="battery">
+                <span class="battery-level"></span>
+              </span>
+            </div>
+          </div>
           <!-- Website 1 -->
           <div id="site-1" class="website">
             <div class="topbar">
@@ -492,6 +921,7 @@
               </div>
             </div>
           </div>
+          <div class="home-indicator"></div>
         </div>
       </div>
       <div class="iphone-container" id="phone-2">
@@ -501,6 +931,16 @@
           class="iphone-skin"
         />
         <div class="screen">
+          <div class="status-bar">
+            <span class="time">9:41</span>
+            <div class="status-right">
+              <span class="signal"></span>
+              <span class="wifi"></span>
+              <span class="battery">
+                <span class="battery-level"></span>
+              </span>
+            </div>
+          </div>
           <!-- Website 2 -->
           <div id="site-2" class="website">
             <div class="scroll-content">
@@ -688,57 +1128,192 @@
               </div>
             </div>
           </div>
+          <div class="home-indicator"></div>
+        </div>
+      </div>
+      <!-- Overlay that visualizes:
+             1) compare prices (price badges)
+             2) check availability (mini calendar)
+             3) still wonder if you are getting the best deal (doubt bubble) -->
+      <div class="overlay-layer">
+        <div class="price-compare">
+          <div class="price-badge bad">
+            <div class="label">$219</div>
+            <div class="meta">Site A</div>
+          </div>
+          <div class="price-badge best">
+            <div class="label">$189</div>
+            <div class="meta">Site B</div>
+          </div>
+        </div>
+
+        <div class="availability-card">
+          <div class="availability-header">
+            <span class="label">Availability</span>
+            <span class="dates">Oct 12–15</span>
+          </div>
+          <div class="availability-grid">
+            <div class="slot booked">12</div>
+            <div class="slot booked">13</div>
+            <div class="slot free">14</div>
+            <div class="slot booked">15</div>
+          </div>
+          <div class="availability-caption">
+            <span class="highlight">1 room</span>
+            <span>left tonight</span>
+          </div>
+        </div>
+
+        <div class="doubt-bubble">
+          <span class="emoji">🤔</span>
+          <span class="text">Is this really the best deal?</span>
         </div>
       </div>
     </div>
 
     <script>
+      // ============================================
+      // ANIMATION TIMING CONSTANTS
+      // ============================================
+
+      // Base delay before any animation starts
+      const TRANSITION_DELAY = 4000; // ms
+
+      // Phone flip timing
+      const PHONE_FLIP_DELAY = 0; // ms after base delay
+      const SCROLL_START_DELAY = 500; // ms after phone flip
+
+      // Price comparison timing
+      const PRICE_VISIBLE_DELAY = 900; // ms after base delay
+      const PRICE_EMPHASIZED_DELAY = 2200; // ms after base delay
+      const PRICE_FADE_OUT_DELAY = 3400; // ms after base delay
+
+      // Availability card timing
+      const AVAILABILITY_VISIBLE_DELAY = 3800; // ms after base delay
+      const AVAILABILITY_SCAN_DELAY = 4200; // ms after base delay
+      const AVAILABILITY_FADE_OUT_DELAY = 6500; // ms after base delay
+
+      // Phone shrink & doubt bubble timing
+      const PHONE_SHRINK_DELAY = 6500; // ms after base delay
+      const DOUBT_VISIBLE_DELAY = 6500; // ms after base delay
+      const DOUBT_GROW_DELAY = 7260; // ms after base delay
+
+      // ============================================
+      // DOM ELEMENTS
+      // ============================================
       const phone1 = document.getElementById("phone-1");
       const phone2 = document.getElementById("phone-2");
-
-      const transitionDelay = 4000; // ms
+      const priceCompare = document.querySelector(".price-compare");
+      const availabilityCard = document.querySelector(".availability-card");
+      const doubtBubble = document.querySelector(".doubt-bubble");
 
       function animateTransition() {
+        const base = TRANSITION_DELAY;
+
+        // 1) "You open one site, then another" – handled by the phone flip
         setTimeout(() => {
-          phone1.style.transform = "rotateY(-180deg)";
-          phone2.style.transform = "rotateY(0deg)";
+          phone1.classList.add("is-flipped");
+          phone2.classList.add("is-flipped");
+        }, base + PHONE_FLIP_DELAY);
+
+        // Start subtle auto-scroll on the second site
+        setTimeout(() => {
+          const scrollContent = document.querySelector(
+            "#site-2 .scroll-content"
+          );
+          if (scrollContent) {
+            scrollContent.classList.add("is-scrolling");
+          }
+        }, base + SCROLL_START_DELAY);
+
+        // 2) "compare prices" – bring in price badges on the side
+        if (priceCompare) {
           setTimeout(() => {
-            document
-              .querySelector("#site-2 .scroll-content")
-              .classList.add("is-scrolling");
-          }, 500); // Corresponds to animation duration
-        }, transitionDelay);
+            priceCompare.classList.add("is-visible");
+          }, base + PRICE_VISIBLE_DELAY);
+
+          setTimeout(() => {
+            priceCompare.classList.add("is-emphasized");
+          }, base + PRICE_EMPHASIZED_DELAY);
+
+          setTimeout(() => {
+            priceCompare.classList.add("is-faded-out");
+          }, base + PRICE_FADE_OUT_DELAY);
+        }
+
+        // 3) "check availability" – mini calendar scanning for the last free slot
+        if (availabilityCard) {
+          setTimeout(() => {
+            availabilityCard.classList.add("is-visible");
+          }, base + AVAILABILITY_VISIBLE_DELAY);
+
+          setTimeout(() => {
+            availabilityCard.classList.add("is-scanning");
+          }, base + AVAILABILITY_SCAN_DELAY);
+
+          setTimeout(() => {
+            availabilityCard.classList.add("is-faded-out");
+          }, base + AVAILABILITY_FADE_OUT_DELAY);
+        }
+
+        // 4) "and still wonder if you are getting the best deal." – shrink phone and grow doubt bubble
+        setTimeout(() => {
+          // Stop scrolling
+          const scrollContent = document.querySelector(
+            "#site-2 .scroll-content"
+          );
+          if (scrollContent) {
+            scrollContent.classList.remove("is-scrolling");
+          }
+
+          // Shrink both phones. The transform is now handled in CSS to preserve rotation.
+          phone1.classList.add("is-shrinking");
+          phone2.classList.add("is-shrinking");
+        }, base + PHONE_SHRINK_DELAY);
+
+        // Show and grow the doubt bubble
+        if (doubtBubble) {
+          setTimeout(() => {
+            doubtBubble.classList.add("is-visible");
+          }, base + DOUBT_VISIBLE_DELAY);
+
+          setTimeout(() => {
+            doubtBubble.classList.add("is-growing");
+          }, base + DOUBT_GROW_DELAY);
+
+          const startWobble = (event) => {
+            // We only want to listen for the transform transition to end
+            if (event.propertyName === "transform") {
+              doubtBubble.classList.add("is-wobbling");
+              doubtBubble.removeEventListener("transitionend", startWobble);
+            }
+          };
+          doubtBubble.addEventListener("transitionend", startWobble);
+        }
       }
 
       // Start the animation on page load
       animateTransition();
-      // Dynamically size container to match image aspect ratio
-      const img = document.querySelector(".iphone-skin");
-      img.onload = () => {
-        const naturalWidth = img.naturalWidth;
-        const naturalHeight = img.naturalHeight;
+      // Dynamically scale container to fit browser viewport for better performance
+      function scaleToViewport() {
         const container = document.querySelector(".animation-container");
-        container.style.width = `${naturalWidth}px`;
-        container.style.height = `${naturalHeight}px`;
+        const baseWidth = 364; // From CSS
+        const baseHeight = 750; // From CSS
 
-        // Fit within a 1080x1920 viewport for video export
-        const viewportWidth = 1080;
-        const viewportHeight = 1920;
-        const widthScale = viewportWidth / naturalWidth;
-        const heightScale = viewportHeight / naturalHeight;
-        // Use 95% of the available space to have some margin
-        const scale = Math.min(widthScale, heightScale) * 0.95;
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        const widthScale = viewportWidth / baseWidth;
+        const heightScale = viewportHeight / baseHeight;
+
+        // Use 90% of available space for margin
+        const scale = Math.min(widthScale, heightScale) * 0.9;
+
         container.style.transform = `scale(${scale})`;
+      }
 
-        // Adjust screen positioning to match new dimensions
-        // Assuming screen offsets are proportional; adjust these values based on actual design
-        const screen = document.querySelector(".screen");
-        screen.style.top = `${10 * (naturalHeight / 750)}px`; // Scale offsets assuming original height 750
-        screen.style.left = `${14 * (naturalWidth / 364)}px`;
-        screen.style.right = `${14 * (naturalWidth / 364)}px`;
-        screen.style.bottom = `${10 * (naturalHeight / 750)}px`;
-        screen.style.borderRadius = `${44 * (naturalHeight / 750)}px`;
-      };
+      window.addEventListener("load", scaleToViewport);
+      window.addEventListener("resize", scaleToViewport);
     </script>
   </body>
 </html>

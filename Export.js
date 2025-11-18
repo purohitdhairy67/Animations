@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 const path = require("path");
 
-const filename = "bidmyroom_search.html";
+const filename = "hotel_sites_with_scroll.html";
 const outputFilename = filename.replace(".html", ".mp4");
 
 (async () => {
@@ -11,7 +11,7 @@ const outputFilename = filename.replace(".html", ".mp4");
   await page.goto(`file://${path.join(__dirname, filename)}`, {
     waitUntil: "networkidle0",
   });
-  await page.setViewport({ width: 1000, height: 1080 });
+  await page.setViewport({ width: 2000, height: 2000 });
 
   // // Wait for the Macbook skin image to load
   // await page.evaluate(() => {
