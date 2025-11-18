@@ -461,14 +461,11 @@
       .doubt-bubble.is-visible {
         opacity: 1;
         transform: translateX(-50%) translateY(-50%)
-          scale(var(--scale-doubt-bubble-visible));
-      }
-
-      .doubt-bubble.is-growing {
-        transform: translateX(-50%) translateY(-50%)
           scale(var(--scale-doubt-bubble-growing));
-        transition: transform calc(var(--duration-doubt-bubble) * 1.2)
-          var(--ease-animation);
+        transition-property: opacity, transform;
+        transition-duration: var(--duration-doubt-bubble),
+          calc(var(--duration-doubt-bubble) * 1.2);
+        transition-timing-function: var(--ease-animation);
       }
 
       @keyframes doubt-wobble {
@@ -777,7 +774,8 @@
       }
 
       #site-2 .scroll-content.is-scrolling {
-        animation: scroll-up var(--duration-scroll-animation) linear infinite;
+        animation: scroll-up var(--duration-scroll-animation) ease-in-out
+          infinite;
       }
 
       /* Give scrolling content some breathing room above the home indicator */
@@ -1177,7 +1175,7 @@
       // ============================================
 
       // Base delay before any animation starts
-      const TRANSITION_DELAY = 4000; // ms
+      const TRANSITION_DELAY = 6000; // ms
 
       // Phone flip timing
       const PHONE_FLIP_DELAY = 0; // ms after base delay
@@ -1196,7 +1194,6 @@
       // Phone shrink & doubt bubble timing
       const PHONE_SHRINK_DELAY = 6500; // ms after base delay
       const DOUBT_VISIBLE_DELAY = 6500; // ms after base delay
-      const DOUBT_GROW_DELAY = 7260; // ms after base delay
 
       // ============================================
       // DOM ELEMENTS
@@ -1276,10 +1273,6 @@
           setTimeout(() => {
             doubtBubble.classList.add("is-visible");
           }, base + DOUBT_VISIBLE_DELAY);
-
-          setTimeout(() => {
-            doubtBubble.classList.add("is-growing");
-          }, base + DOUBT_GROW_DELAY);
 
           const startWobble = (event) => {
             // We only want to listen for the transform transition to end
