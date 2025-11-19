@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BidMyRoom End Scene</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: #ffffff;
+        font-family: "Montserrat", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .text-element {
+        font-size: 5rem;
+        font-weight: 800;
+        color: #000;
+        position: absolute;
+        opacity: 0;
+      }
+
+      /* Phase 1 Container */
+      #phase-1 {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .word {
+        font-size: 5rem; /* Large text */
+        font-weight: 800;
+        opacity: 0; /* Start hidden */
+        transform: translateY(20px);
+      }
+
+      /* Phase 2 */
+      #phase-2-text {
+        font-size: 6rem;
+        font-weight: 800;
+        opacity: 0;
+      }
+
+      /* Phase 3 */
+      #logo-container {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0; /* Start hidden */
+        /* Initial layout: Icon Left, Text Right */
+      }
+
+      #logo-icon {
+        width: 150px;
+        height: 150px;
+        z-index: 2; /* On top of text */
+        position: relative;
+      }
+
+      #logo-text {
+        height: 50px; /* Proportional to icon roughly */
+        margin-left: 20px;
+        z-index: 1; /* Behind icon */
+        position: relative;
+      }
+
+      /* Helper to center absolute elements */
+      .absolute-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <!-- Phase 1: Let Them Bid -->
+      <div id="phase-1" class="absolute-center">
+        <div class="word" id="word-let">Let</div>
+        <div class="word" id="word-them">Them</div>
+        <div class="word" id="word-bid">Bid</div>
+      </div>
+
+      <!-- Phase 2: Room? -->
+      <div id="phase-2-text" class="absolute-center">Room?</div>
+
+      <!-- Phase 3: Logo Reveal -->
+      <div id="logo-container" class="absolute-center">
+        <img src="Assets/logo-icon.svg" id="logo-icon" alt="BidMyRoom Icon" />
+        <img src="Assets/logo-text.svg" id="logo-text" alt="BidMyRoom Text" />
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+        gsap.registerPlugin();
+
+        const tl = gsap.timeline({
+          defaults: { ease: "power2.out" },
+        });
+
+        // --- Phase 1: "Let... Them... Bid" ---
+        // Rhythm: "Let" (pause) "Them" (pause) "Bid"
+
+        // 1. "Let" appears
+        tl.to("#word-let", {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+        });
+
+        // Pause
+        tl.to({}, { duration: 0.4 });
+
+        // 2. "Them" appears
+        tl.to("#word-them", {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+        });
+
+        // Pause
+        tl.to({}, { duration: 0.4 });
+
+        // 3. "Bid" appears
+        tl.to("#word-bid", {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+        });
+
+        // Hold Phase 1 briefly
+        tl.to({}, { duration: 0.8 });
+
+        // Fade out Phase 1
+        tl.to("#phase-1", {
+          opacity: 0,
+          scale: 0.9,
+          duration: 0.4,
+          onComplete: () => {
+            document.querySelector("#phase-1").style.display = "none";
+          },
+        });
+
+        // --- Phase 2: "Room?" ---
+        // 4. "Room?" appears
+        tl.to(
+          "#phase-2-text",
+          {
+            opacity: 1,
+            scale: 1.1 /* slight pop in */,
+            duration: 0.5,
+          },
+          "-=0.1"
+        ); // slightly overlap with fade out
+
+        // Hold Phase 2
+        tl.to({}, { duration: 1.0 });
+
+        // Fade out Phase 2
+        tl.to("#phase-2-text", {
+          opacity: 0,
+          scale: 1.2 /* zooms in while fading out */,
+          duration: 0.4,
+        });
+
+        // --- Phase 3: Logo Sequence ---
+        // Initial Setup for Phase 3 in animation to ensure positions
+        tl.set("#logo-container", { opacity: 1 });
+
+        // 5. Show Logo Icon and Text
+        // Let's have them fade in or pop in
+        tl.from(["#logo-icon", "#logo-text"], {
+          opacity: 0,
+          y: 20,
+          duration: 0.6,
+          stagger: 0.1,
+        });
+
+        // Hold briefly
+        tl.to({}, { duration: 0.8 });
+
+        // 6. Animation: Text goes left disappearing behind Logo, Logo centers
+        // Dynamic calculation to ensure perfect centering
+
+        const icon = document.querySelector("#logo-icon");
+        const text = document.querySelector("#logo-text");
+        const container = document.querySelector("#logo-container");
+
+        // We need to calculate these values right before the animation starts
+        // or use a function in the timeline to ensure layout is rendered.
+        // However, since they are visible (opacity 0 but in DOM), we can measure.
+
+        // But wait, 'display: flex' aligns them.
+        // Let's assume the layout is stable.
+
+        // We want to move the Icon to the center of the screen.
+        // Currently, the Center of the "Container" is at the Center of the Screen.
+        // The Container contains [Icon] [Gap] [Text].
+        // Center of Container = Middle of that block.
+        // Center of Icon = Middle of Icon.
+        // We need to shift everything so that Center of Icon = Center of Container (which is Center of Screen).
+        // Shift Amount = Center of Container - Center of Icon.
+
+        // Let's use a function to calculate this at runtime
+        tl.add(() => {
+          const iconRect = icon.getBoundingClientRect();
+          const textRect = text.getBoundingClientRect();
+          const containerRect = container.getBoundingClientRect();
+
+          // Current center x of icon
+          const iconCenterX = iconRect.left + iconRect.width / 2;
+          // Screen center x (which is also container center approx if absolute centered)
+          const screenCenterX = window.innerWidth / 2;
+
+          const shiftNeeded = screenCenterX - iconCenterX;
+
+          // Animate Icon to shiftNeeded
+          // Wait, we are animating 'x' property.
+          // If we animate just the icon, it moves relative to its flex position?
+          // Yes, transform x applies after layout.
+
+          gsap.to("#logo-icon", {
+            x: shiftNeeded,
+            duration: 1.0,
+            ease: "power2.inOut",
+          });
+
+          // Text moves left and fades
+          gsap.to("#logo-text", {
+            x: -textRect.width, // Move left by its own width roughly or measure
+            opacity: 0,
+            duration: 1.0,
+            ease: "power2.inOut",
+          });
+        }, "merge");
+
+        // Add a dummy tween to the timeline to occupy the duration of the dynamic animation
+        // so the next steps wait for it.
+        tl.to({}, { duration: 1.0 });
+
+        // 7. Bounce Effect on Logo
+        // "Logo will have Some Small bounce gets bit bigger and than normal"
+        tl.to("#logo-icon", {
+          scale: 1.1,
+          duration: 0.2,
+          ease: "power1.out",
+        });
+
+        tl.to("#logo-icon", {
+          scale: 1.0,
+          duration: 0.5,
+          ease: "elastic.out(1, 0.3)",
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BidMyRoom - End Scene 4 (Dramatic)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: #ffffff;
+        font-family: "Montserrat", sans-serif;
+      }
+
+      #scene-container {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .absolute-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        pointer-events: none;
+      }
+
+      /* --- Phase 1: Let Them Bid --- */
+      .word-huge {
+        position: absolute;
+        font-weight: 900;
+        text-transform: uppercase;
+        color: #000;
+        opacity: 0; /* Start hidden */
+        line-height: 0.9;
+      }
+
+      #word-let {
+        font-size: 18vw;
+        top: 5%;
+        left: -5%; /* Start slightly off for animation */
+      }
+
+      #word-them {
+        font-size: 18vw;
+        top: 30%;
+        right: -5%;
+        text-align: right;
+      }
+
+      #word-bid {
+        font-size: 32vw;
+        bottom: 5%;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 5;
+        color: #000;
+      }
+
+      /* --- Phase 2: Room? --- */
+      #phase-2-container {
+        position: absolute;
+        inset: 0;
+        background-color: #0f81c0; /* Brand Blue */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        z-index: 10;
+      }
+
+      #word-room {
+        font-size: 25vw;
+        font-weight: 900;
+        color: #ffffff;
+        opacity: 0;
+        transform-origin: center center;
+      }
+
+      /* --- Phase 3: Logo --- */
+      #phase-3-wipe {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background-color: #ffffff;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 20;
+      }
+
+      #logo-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 25;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: clamp(1rem, 3vw, 2rem);
+        opacity: 0;
+      }
+
+      #logo-icon {
+        width: clamp(100px, 20vw, 200px);
+        height: auto;
+      }
+
+      #logo-text {
+        width: clamp(180px, 35vw, 350px);
+        height: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="scene-container">
+      <!-- Phase 1 -->
+      <div id="word-let" class="word-huge">Let</div>
+      <div id="word-them" class="word-huge">Them</div>
+      <div id="word-bid" class="word-huge">Bid</div>
+
+      <!-- Phase 2 -->
+      <div id="phase-2-container">
+        <div id="word-room">Room?</div>
+      </div>
+
+      <!-- Phase 3 -->
+      <div id="phase-3-wipe"></div>
+      <div id="logo-container">
+        <img src="Assets/logo-icon.svg" id="logo-icon" alt="BidMyRoom Icon" />
+        <img src="Assets/logo-text.svg" id="logo-text" alt="BidMyRoom Text" />
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+        // --- Phase 1: Let Them Bid ---
+        // Dramatic, heavy stomps
+        tl.set("#word-let", { x: -100, opacity: 0 })
+          .to("#word-let", {
+            x: "10%",
+            opacity: 1,
+            duration: 0.4,
+            ease: "back.out(1.2)",
+          })
+          .to(
+            "#word-let",
+            { scale: 1.05, x: "12%", duration: 3, ease: "linear" },
+            "<"
+          ); // Slow drift
+
+        tl.set("#word-them", { x: 100, opacity: 0 })
+          .to(
+            "#word-them",
+            {
+              x: "-10%",
+              opacity: 1,
+              duration: 0.4,
+              ease: "back.out(1.2)",
+            },
+            "-=2.6"
+          ) // Overlap slightly or adjust timing based on speech
+          .to(
+            "#word-them",
+            { scale: 1.05, x: "-12%", duration: 3, ease: "linear" },
+            "<"
+          );
+
+        // Wait a beat before 'Bid'
+        tl.addLabel("bid", ">-2.6"); // Manual adjustment to match "Let... Them... Bid" rhythm
+
+        // Fix Timing: Let (0) -> 0.4s -> Them (+0.2s delay) -> 0.4s -> Bid
+        // Let's reset and be precise.
+        tl.clear();
+
+        // 1. Let
+        tl.fromTo(
+          "#word-let",
+          { x: -50, opacity: 0, scale: 0.8 },
+          { x: "5vw", opacity: 1, scale: 1, duration: 0.5, ease: "power4.out" }
+        );
+
+        // 2. Them (Short pause)
+        tl.fromTo(
+          "#word-them",
+          { x: 50, opacity: 0, scale: 0.8 },
+          {
+            x: "-5vw",
+            opacity: 1,
+            scale: 1,
+            duration: 0.5,
+            ease: "power4.out",
+          },
+          "+=0.2"
+        );
+
+        // 3. Bid (Big impact)
+        tl.fromTo(
+          "#word-bid",
+          { y: 100, opacity: 0, scale: 1.5, filter: "blur(20px)" },
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            filter: "blur(0px)",
+            duration: 0.6,
+            ease: "elastic.out(1, 0.5)",
+          },
+          "+=0.2"
+        );
+
+        // Hold for "Let them bid" to sink in
+        tl.to({}, { duration: 0.8 });
+
+        // --- Phase 2: Room? (Dramatic Cut) ---
+        // Instant background switch + Text Pop
+        tl.to("#phase-2-container", { opacity: 1, duration: 0.1 });
+        tl.fromTo(
+          "#word-room",
+          { scale: 0.5, opacity: 0, rotation: -10 },
+          {
+            scale: 1,
+            opacity: 1,
+            rotation: 0,
+            duration: 0.5,
+            ease: "back.out(2)",
+          },
+          "<"
+        );
+
+        // Hold "Room?"
+        tl.to({}, { duration: 0.8 });
+
+        // --- Phase 3: Bidmyroom (Resolution) ---
+        // Wipe transition
+        tl.to("#phase-3-wipe", {
+          width: "300vmax",
+          height: "300vmax",
+          duration: 0.8,
+          ease: "expo.inOut",
+        });
+
+        // Logo reveal
+        tl.to("#logo-container", { opacity: 1, duration: 0.1 }, "-=0.4");
+        tl.from(
+          "#logo-icon",
+          {
+            y: 50,
+            opacity: 0,
+            duration: 0.8,
+            ease: "power3.out",
+          },
+          "-=0.3"
+        );
+        tl.from(
+          "#logo-text",
+          {
+            y: 30,
+            opacity: 0,
+            duration: 0.8,
+            ease: "power3.out",
+          },
+          "-=0.6"
+        );
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BidMyRoom - End Card 2</title>
+
+    <!-- GSAP for precise, timeline-based motion -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+      }
+
+      body {
+        overflow: hidden;
+        background: #ffffff; /* Plain background */
+        font-family: "Montserrat", system-ui, -apple-system, BlinkMacSystemFont,
+          sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #scene-root {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      .absolute-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      /* Phase 1 – Let / Them / Bid --------------------------------------- */
+
+      #phase-1 {
+        display: flex;
+        gap: 1rem;
+        align-items: baseline;
+        justify-content: center;
+        opacity: 0;
+      }
+
+      .word {
+        font-size: clamp(3.5rem, 6vw, 5.5rem);
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        color: #000000;
+        opacity: 0;
+        transform: translateY(24px);
+        filter: blur(10px);
+      }
+
+      /* Phase 2 – Room? --------------------------------------------------- */
+
+      #phase-2-text {
+        font-size: clamp(4rem, 7vw, 6rem);
+        font-weight: 800;
+        letter-spacing: 0.03em;
+        color: #0f81c0; /* Brand pop for the question */
+        opacity: 0;
+        transform: scale(0.8);
+      }
+
+      /* Phase 3 – Logo + Bidmyroom --------------------------------------- */
+
+      #logo-wrapper {
+        opacity: 0;
+      }
+
+      #logo-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1.5rem;
+      }
+
+      #logo-icon {
+        width: clamp(120px, 14vw, 160px);
+        height: auto;
+        transform-origin: center center;
+      }
+
+      #logo-text {
+        height: clamp(40px, 4.5vw, 60px);
+        width: auto;
+      }
+
+      /* Subtle vignette to make center feel a bit more dramatic */
+      #vignette {
+        pointer-events: none;
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at center,
+          rgba(0, 0, 0, 0) 0%,
+          rgba(0, 0, 0, 0.12) 85%
+        );
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="scene-root">
+      <!-- Soft vignette for drama -->
+      <div id="vignette"></div>
+
+      <!-- Phase 1: Let / Them / Bid -->
+      <div id="phase-1" class="absolute-center">
+        <div class="word" id="word-let">Let</div>
+        <div class="word" id="word-them">Them</div>
+        <div class="word" id="word-bid">Bid</div>
+      </div>
+
+      <!-- Phase 2: Room? -->
+      <div id="phase-2-text" class="absolute-center">Room?</div>
+
+      <!-- Phase 3: Logo + Bidmyroom -->
+      <div id="logo-wrapper" class="absolute-center">
+        <div id="logo-container">
+          <img
+            src="Assets/logo-icon.svg"
+            id="logo-icon"
+            alt="BidMyRoom Logo Icon"
+          />
+          <img
+            src="Assets/logo-text.svg"
+            id="logo-text"
+            alt="BidMyRoom Wordmark"
+          />
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const tl = gsap.timeline({
+          defaults: { ease: "power3.out" },
+        });
+
+        const root = document.getElementById("scene-root");
+        const logoIcon = document.getElementById("logo-icon");
+        const logoText = document.getElementById("logo-text");
+        const logoWrapper = document.getElementById("logo-wrapper");
+        const vignette = document.getElementById("vignette");
+
+        // Start with a very subtle vignette fade-in over the whole card
+        tl.to(vignette, {
+          opacity: 1,
+          duration: 1.2,
+          ease: "power2.out",
+        });
+
+        // ---------------------------------------------------------------
+        // Phase 1: "Let ... Them ... Bid"
+        // Rhythm: Let (pause) Them (pause) Bid
+        // ---------------------------------------------------------------
+
+        // Bring the group in slightly
+        tl.to(
+          "#phase-1",
+          {
+            opacity: 1,
+            duration: 0.2,
+          },
+          "-=0.7"
+        );
+
+        // "Let"
+        tl.to(
+          "#word-let",
+          {
+            opacity: 1,
+            y: 0,
+            filter: "blur(0px)",
+            duration: 0.45,
+          },
+          "-=0.1"
+        );
+
+        // Pause – matches the little vocal gap
+        tl.to({}, { duration: 0.35 });
+
+        // "Them"
+        tl.to("#word-them", {
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+          duration: 0.45,
+        });
+
+        // Pause
+        tl.to({}, { duration: 0.35 });
+
+        // "Bid"
+        tl.to("#word-bid", {
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+          duration: 0.45,
+        });
+
+        // Hold the full phrase on screen a bit
+        tl.to({}, { duration: 0.9 });
+
+        // Fade / scale out Phase 1
+        tl.to("#phase-1", {
+          opacity: 0,
+          scale: 0.96,
+          duration: 0.45,
+          ease: "power2.inOut",
+        });
+
+        // ---------------------------------------------------------------
+        // Phase 2: "Room?"
+        // ---------------------------------------------------------------
+
+        tl.to(
+          "#phase-2-text",
+          {
+            opacity: 1,
+            scale: 1.06,
+            duration: 0.5,
+            ease: "back.out(1.4)",
+          },
+          "-=0.1"
+        );
+
+        // Hold "Room?" for a clear beat
+        tl.to({}, { duration: 1.0 });
+
+        tl.to("#phase-2-text", {
+          opacity: 0,
+          scale: 1.14,
+          duration: 0.45,
+          ease: "power2.in",
+        });
+
+        // ---------------------------------------------------------------
+        // Phase 3: Logo + Bidmyroom
+        // ---------------------------------------------------------------
+
+        // Bring logo wrapper in
+        tl.to(
+          logoWrapper,
+          {
+            opacity: 1,
+            duration: 0.4,
+          },
+          "-=0.1"
+        );
+
+        // Pop in icon & wordmark
+        tl.from(
+          [logoIcon, logoText],
+          {
+            opacity: 0,
+            y: 24,
+            duration: 0.55,
+            stagger: 0.1,
+          },
+          "-=0.1"
+        );
+
+        // Small hold with full logo
+        tl.to({}, { duration: 0.8 });
+
+        // Move the icon to perfect center while the wordmark slides off left
+        tl.add(() => {
+          const iconRect = logoIcon.getBoundingClientRect();
+          const rootRect = root.getBoundingClientRect();
+          const textRect = logoText.getBoundingClientRect();
+
+          const screenCenterX = rootRect.left + rootRect.width / 2;
+          const iconCenterX = iconRect.left + iconRect.width / 2;
+          const shiftX = screenCenterX - iconCenterX;
+
+          // Icon to center
+          gsap.to(logoIcon, {
+            x: shiftX,
+            duration: 1.0,
+            ease: "power2.inOut",
+          });
+
+          // Text slides left and soft-fades as if disappearing behind icon
+          gsap.to(logoText, {
+            x: -textRect.width * 1.1,
+            opacity: 0,
+            duration: 1.0,
+            ease: "power2.inOut",
+          });
+        });
+
+        // Let that reposition play out
+        tl.to({}, { duration: 1.0 });
+
+        // Final bounce of the icon: small overshoot then settle
+        tl.to(logoIcon, {
+          scale: 1.08,
+          duration: 0.2,
+          ease: "power1.out",
+        });
+
+        tl.to(logoIcon, {
+          scale: 1.0,
+          duration: 0.6,
+          ease: "elastic.out(1, 0.4)",
+        });
+
+        // Then simply hold the final logo on screen; timeline ends here
+      });
+    </script>
+  </body>
+</html>
