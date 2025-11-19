@@ -36,7 +36,7 @@ const outputFilename = filename.replace(".html", ".mp4");
   await recorder.start(outputFilename);
 
   // Let animation run
-  await new Promise((resolve) => setTimeout(resolve, 20000));
+  await new Promise((resolve) => setTimeout(resolve, 22000));
 
   await recorder.stop();
   await browser.close();

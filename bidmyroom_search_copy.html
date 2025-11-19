@@ -27,6 +27,95 @@
         font-family: "Manrope", sans-serif;
       }
 
+      :root {
+        /* Dark Theme Variables (Default) */
+        --bg-screen: rgba(10, 10, 10, 0.68);
+        --border-screen: rgba(255, 255, 255, 0.16);
+
+        --bg-status-bar: #1f1f1f;
+        --text-status-bar: #fff;
+        --battery-border: #f5f5f5;
+        --battery-fill: #4caf50;
+
+        --text-primary: #ffffff;
+        --text-secondary: #d1d5db;
+
+        --border-card: rgba(255, 255, 255, 0.1);
+
+        --text-card-name-unread: #ffffff;
+        --text-card-details-unread: #f0f0f0;
+        --text-card-time-unread: #60a5fa;
+        --unread-dot: #60a5fa;
+
+        --text-card-name: #f9fafb;
+        --text-card-details: #d1d5db;
+
+        --text-price-gradient-start: #60a5fa;
+        --text-price-gradient-end: #818cf8;
+        --text-price-period: #9ca3af;
+
+        --text-time: #9ca3af;
+
+        --bg-system-msg: rgba(255, 255, 255, 0.1);
+        --text-system-msg: #e5e7eb;
+
+        --bg-tab-bar: rgba(25, 25, 25, 0.7);
+        --border-tab-bar: rgba(255, 255, 255, 0.1);
+        --text-tab-inactive: #8e8e93;
+        --text-tab-active: #ffffff;
+
+        --bg-add-btn-start: #60a5fa;
+        --bg-add-btn-end: #818cf8;
+        --shadow-add-btn: rgba(96, 165, 250, 0.4);
+
+        --icon-color-add: white;
+      }
+
+      .light-theme {
+        /* Light Theme Variables */
+        --bg-screen: rgba(255, 255, 255);
+        --border-screen: rgba(0, 0, 0, 0.1);
+
+        --bg-status-bar: #ffffff;
+        --text-status-bar: #000;
+        --battery-border: #333;
+        --battery-fill: #4cd964;
+
+        --text-primary: #111827; /* gray-900 */
+        --text-secondary: #6b7280; /* gray-500 */
+
+        --border-card: rgba(0, 0, 0, 0.06);
+
+        --text-card-name-unread: #111827;
+        --text-card-details-unread: #374151; /* gray-700 */
+        --text-card-time-unread: #0f81c0; /* Brand Blue */
+        --unread-dot: #0f81c0;
+
+        --text-card-name: #374151; /* gray-700 */
+        --text-card-details: #6b7280; /* gray-500 */
+
+        /* Using Brand Blue #0f81c0 to Tailwind Blue-500 #3b82f6 */
+        --text-price-gradient-start: #0f81c0;
+        --text-price-gradient-end: #3b82f6;
+        --text-price-period: #9ca3af;
+
+        --text-time: #9ca3af;
+
+        --bg-system-msg: rgba(0, 0, 0, 0.05);
+        --text-system-msg: #4b5563;
+
+        --bg-tab-bar: rgba(255, 255, 255, 0.85);
+        --border-tab-bar: rgba(0, 0, 0, 0.1);
+        --text-tab-inactive: #9ca3af;
+        --text-tab-active: #0f81c0; /* Brand Blue */
+
+        --bg-add-btn-start: #0f81c0;
+        --bg-add-btn-end: #3b82f6;
+        --shadow-add-btn: rgba(15, 129, 192, 0.3);
+
+        --icon-color-add: white;
+      }
+
       /* Optional: lock to full viewport */
       .video-frame {
         width: 100vw;
@@ -72,11 +161,11 @@
         z-index: 1;
         display: flex;
         flex-direction: column;
-        background: rgba(10, 10, 10, 0.68);
+        background: var(--bg-screen);
         /* box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6); */
         backdrop-filter: blur(26px);
         -webkit-backdrop-filter: blur(26px);
-        border: 1px solid rgba(255, 255, 255, 0.16);
+        border: 1px solid var(--border-screen);
       }
 
       .status-bar {
@@ -90,8 +179,8 @@
         justify-content: space-between;
         padding: 25px 20px 15px;
         font-size: 11px;
-        color: #fff;
-        background: #1f1f1f;
+        color: var(--text-status-bar);
+        background: var(--bg-status-bar);
         z-index: 10;
         pointer-events: none;
       }
@@ -106,7 +195,7 @@
         width: 20px;
         height: 10px;
         border-radius: 3px;
-        border: 1.5px solid #f5f5f5;
+        border: 1.5px solid var(--battery-border);
         position: relative;
       }
 
@@ -118,7 +207,7 @@
         width: 2px;
         height: 6px;
         border-radius: 1px;
-        background: #f5f5f5;
+        background: var(--battery-border);
       }
 
       .status-bar .battery-level {
@@ -128,7 +217,7 @@
         right: 3px;
         bottom: 1px;
         border-radius: 2px;
-        background: #4caf50;
+        background: var(--battery-fill);
       }
 
       .chat-app {
@@ -136,7 +225,7 @@
         display: flex;
         flex-direction: column;
         padding: 60px 0 84px 0;
-        color: #ffffff;
+        color: var(--text-primary);
       }
 
       .chat-header {
@@ -148,12 +237,12 @@
         font-family: "Manrope", sans-serif;
         font-size: 24px;
         font-weight: 800;
-        color: #ffffff;
+        color: var(--text-primary);
       }
 
       .chat-header .subtitle {
         font-size: 13px;
-        color: #d1d5db;
+        color: var(--text-secondary);
       }
 
       .message-list {
@@ -172,7 +261,7 @@
         display: flex;
         gap: 12px;
         padding: 16px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 1px solid var(--border-card);
         opacity: 0;
         transform: scale(0.95);
         transition: opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
@@ -201,13 +290,13 @@
       }
       .bid-card.unread .name {
         font-weight: 800;
-        color: #ffffff;
+        color: var(--text-card-name-unread);
       }
       .bid-card.unread .details {
-        color: #f0f0f0;
+        color: var(--text-card-details-unread);
       }
       .bid-card.unread .time {
-        color: #60a5fa; /* A highlight color for unread time */
+        color: var(--text-card-time-unread);
         font-weight: 600;
       }
       .bid-card.unread::after {
@@ -218,7 +307,7 @@
         transform: translateY(-50%);
         width: 8px;
         height: 8px;
-        background-color: #60a5fa;
+        background-color: var(--unread-dot);
         border-radius: 50%;
       }
       .bid-card .logo {
@@ -236,12 +325,12 @@
       .bid-card .name {
         font-weight: 700;
         font-size: 15px;
-        color: #f9fafb;
+        color: var(--text-card-name);
       }
 
       .bid-card .details {
         font-size: 13px;
-        color: #d1d5db;
+        color: var(--text-card-details);
         margin-top: 2px;
       }
 
@@ -256,7 +345,11 @@
         font-family: "Manrope", sans-serif;
         font-size: 20px;
         font-weight: 800;
-        background: linear-gradient(to right, #60a5fa, #818cf8);
+        background: linear-gradient(
+          to right,
+          var(--text-price-gradient-start),
+          var(--text-price-gradient-end)
+        );
         background-clip: text;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -265,21 +358,21 @@
       .bid-card .price span {
         font-size: 12px;
         font-weight: 500;
-        color: #9ca3af;
-        -webkit-text-fill-color: #9ca3af;
+        color: var(--text-price-period);
+        -webkit-text-fill-color: var(--text-price-period);
       }
 
       .bid-card .time {
         font-size: 11px;
-        color: #9ca3af;
+        color: var(--text-time);
       }
 
       .system-message {
         text-align: center;
         padding: 8px 12px;
         font-size: 12px;
-        color: #e5e7eb;
-        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-system-msg);
+        background: var(--bg-system-msg);
         border-radius: 99px;
         margin: 8px auto 0 auto;
         opacity: 0;
@@ -296,10 +389,10 @@
         left: 0;
         right: 0;
         height: 65px;
-        background: rgba(25, 25, 25, 0.7);
+        background: var(--bg-tab-bar);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-top: 1px solid var(--border-tab-bar);
         display: flex;
         justify-content: space-around;
         align-items: center;
@@ -312,7 +405,7 @@
         align-items: center;
         justify-content: center;
         gap: 4px;
-        color: #8e8e93;
+        color: var(--text-tab-inactive);
         font-size: 10px;
         font-weight: 500;
         text-decoration: none;
@@ -321,7 +414,7 @@
         transition: color 0.2s ease-in-out;
       }
       .tab-item.active {
-        color: #ffffff;
+        color: var(--text-tab-active);
       }
       .tab-item svg {
         width: 24px;
@@ -335,7 +428,11 @@
         text-decoration: none;
       }
       .add-request-button > div {
-        background: linear-gradient(to right, #60a5fa, #818cf8);
+        background: linear-gradient(
+          to right,
+          var(--bg-add-btn-start),
+          var(--bg-add-btn-end)
+        );
         width: 56px;
         height: 56px;
         border-radius: 50%;
@@ -343,7 +440,7 @@
         align-items: center;
         justify-content: center;
         margin-top: -50px;
-        box-shadow: 0 4px 15px rgba(96, 165, 250, 0.4);
+        box-shadow: 0 4px 15px var(--shadow-add-btn);
         transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
       }
       .add-request-button:active > div {
@@ -352,7 +449,7 @@
       .add-request-button svg {
         width: 28px;
         height: 28px;
-        color: white;
+        color: var(--icon-color-add);
       }
     </style>
   </head>
@@ -542,6 +639,21 @@
       const ANIMATION_START_DELAY = 500;
       const DELAY_BETWEEN_BIDS = 400;
 
+      // --- Theme Management ---
+      function setTheme(theme) {
+        if (theme === "light") {
+          document.documentElement.classList.add("light-theme");
+        } else {
+          document.documentElement.classList.remove("light-theme");
+        }
+      }
+
+      // Check URL parameters for theme
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("theme") === "light") {
+        setTheme("light");
+      }
+
       // --- Inbox Animation Functions ---
       function createBidCard(bidData) {
         const card = document.createElement("div");
@@ -604,6 +716,7 @@
       window.addEventListener("load", () => {
         // Expose to window if you want to re-run from console
         window.animateInbox = animateInbox;
+        window.setTheme = setTheme; // Expose theme setter
       });
 
       // Listen for a message from the parent window to start the animation
@@ -613,6 +726,10 @@
           // Add a basic security check for the origin if needed
           if (event.data === "startAnimation") {
             animateInbox();
+          } else if (event.data === "theme:light") {
+            setTheme("light");
+          } else if (event.data === "theme:dark") {
+            setTheme("dark");
           }
         },
         false
