@@ -268,11 +268,65 @@
         /* Ensure cursor stays inside on overflow */
         overflow: hidden;
       }
+
+      .main-container-animating {
+        height: var(--main-container-height);
+        width: var(--main-container-width);
+        position: relative;
+      }
+
+      .main-container-animating #home-main-form {
+        position: absolute;
+        top: var(--home-main-form-top);
+        left: var(--home-main-form-left);
+        width: var(--home-main-form-width);
+      }
+
+      .main-container-animating #frame-shell,
+      .main-container-animating #search-shell {
+        position: absolute;
+        top: var(--frame-shell-top);
+        left: var(--frame-shell-left);
+        width: var(--frame-shell-width);
+      }
+
+      .fade-out-left {
+        animation: fadeOutLeft 0.5s ease-out forwards;
+      }
+
+      .fade-out-right {
+        animation: fadeOutRight 0.5s ease-out forwards;
+      }
+
+      .fade-out {
+        animation: fadeOut 0.5s ease-out forwards;
+      }
+
+      @keyframes fadeOutLeft {
+        to {
+          opacity: 0;
+          transform: translateX(-50%);
+        }
+      }
+
+      @keyframes fadeOutRight {
+        to {
+          opacity: 0;
+          transform: translateX(50%);
+        }
+      }
+
+      @keyframes fadeOut {
+        to {
+          opacity: 0;
+        }
+      }
     </style>
   </head>
   <body class="video-frame flex items-center justify-center">
     <!-- 1. Centering wrapper only (no big white card) -->
     <div
+      id="main-container"
       class="flex flex-col items-center justify-center gap-6"
       style="
         padding: 28px;
@@ -746,6 +800,15 @@
         </div>
       </div>
     </div>
+    <div
+      id="inbox-placeholder"
+      class="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-500 pointer-events-none"
+    >
+      <iframe
+        src="bidmyroom_search_copy.html"
+        class="w-[364px] h-[750px] border-0 rounded-[58px] bg-transparent"
+      ></iframe>
+    </div>
 
     <script>
       //   const BRAND_TEXT = "BIDMYROOM.COM";
@@ -1017,6 +1080,94 @@
           await sleep(BUTTON_PRESS_DURATION);
           searchButton.classList.remove("search-button-pressed");
 
+          await sleep(300); // Add a minor delay here
+
+          // --- NEW ANIMATION LOGIC ---
+          const mainContainer = document.getElementById("main-container");
+          const homeMainForm = document.getElementById("home-main-form");
+          const frameShell = document.getElementById("frame-shell");
+          const searchShell = document.getElementById("search-shell");
+
+          if (mainContainer && homeMainForm && frameShell && searchShell) {
+            const mainContainerRect = mainContainer.getBoundingClientRect();
+            const homeMainFormRect = homeMainForm.getBoundingClientRect();
+            const frameShellRect = frameShell.getBoundingClientRect();
+
+            // Set CSS variables for positioning
+            mainContainer.style.setProperty(
+              "--main-container-height",
+              `${mainContainer.offsetHeight - 150}px`
+            );
+            mainContainer.style.setProperty(
+              "--main-container-width",
+              `${mainContainer.offsetWidth}px`
+            );
+            mainContainer.style.setProperty(
+              "--home-main-form-top",
+              `${homeMainFormRect.top - mainContainerRect.top}px`
+            );
+            mainContainer.style.setProperty(
+              "--home-main-form-left",
+              `${homeMainFormRect.left - mainContainerRect.left}px`
+            );
+            mainContainer.style.setProperty(
+              "--home-main-form-width",
+              `${homeMainFormRect.width}px`
+            );
+            mainContainer.style.setProperty(
+              "--frame-shell-top",
+              `${frameShellRect.top - mainContainerRect.top}px`
+            );
+            mainContainer.style.setProperty(
+              "--frame-shell-left",
+              `${frameShellRect.left - mainContainerRect.left}px`
+            );
+            mainContainer.style.setProperty(
+              "--frame-shell-width",
+              `${frameShellRect.width}px`
+            );
+
+            // Add classes to trigger animations
+            mainContainer.classList.add("main-container-animating");
+            homeMainForm.classList.add("fade-out-left");
+            frameShell.classList.add("fade-out-right");
+            searchShell.classList.add("fade-out");
+
+            // After animation, hide elements to prevent any interaction
+            let animationEndCount = 0;
+            const onAnimationEnd = (event) => {
+              if (event.target !== mainContainer) {
+                event.target.style.display = "none";
+                animationEndCount++;
+                if (animationEndCount === 3) {
+                  const placeholder =
+                    document.getElementById("inbox-placeholder");
+                  if (placeholder) {
+                    placeholder.classList.remove("opacity-0");
+                    placeholder.style.pointerEvents = "auto";
+
+                    // Send a message to the iframe to start its animation
+                    const iframe = placeholder.querySelector("iframe");
+                    if (iframe && iframe.contentWindow) {
+                      iframe.contentWindow.postMessage("startAnimation", "*");
+                    }
+                  }
+                }
+              }
+            };
+
+            homeMainForm.addEventListener("animationend", onAnimationEnd, {
+              once: true,
+            });
+            frameShell.addEventListener("animationend", onAnimationEnd, {
+              once: true,
+            });
+            searchShell.addEventListener("animationend", onAnimationEnd, {
+              once: true,
+            });
+          }
+          // --- END NEW LOGIC ---
+
           await sleep(500); // Wait a moment before hiding cursor
           cursor.classList.remove("visible");
         };
@@ -1150,7 +1301,7 @@
         );
 
         // --- Animation Orchestration ---
-        const phaseOneDelay = 1000;
+        const phaseOneDelay = 10000;
         const phaseOneDuration = ANIMATION_DURATION;
         const phaseTwoDelay =
           phaseOneDelay + phaseOneDuration + PAUSE_BETWEEN_PHASES;

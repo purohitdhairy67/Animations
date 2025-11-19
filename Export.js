@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 const path = require("path");
 
-const filename = "hotel_sites_with_scroll.html";
+const filename = "bidmyroom_search.html";
 const outputFilename = filename.replace(".html", ".mp4");
 
 (async () => {
@@ -36,7 +36,7 @@ const outputFilename = filename.replace(".html", ".mp4");
   await recorder.start(outputFilename);
 
   // Let animation run
-  await new Promise((resolve) => setTimeout(resolve, 18000));
+  await new Promise((resolve) => setTimeout(resolve, 20000));
 
   await recorder.stop();
   await browser.close();
