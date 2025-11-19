@@ -140,6 +140,17 @@
         will-change: transform, opacity;
       }
 
+      .animation-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 50;
+        pointer-events: none;
+        overflow: visible;
+      }
+
       .iphone-skin {
         position: absolute;
         top: 0;
@@ -247,7 +258,7 @@
 
       .message-list {
         flex-grow: 1;
-        padding: 0 15px;
+        /* padding: 0 15px; */
         overflow-y: auto;
         display: flex;
         flex-direction: column;
@@ -260,20 +271,23 @@
       .bid-card {
         display: flex;
         gap: 12px;
-        padding: 16px 0;
+        padding: 16px 15px;
         border-bottom: 1px solid var(--border-card);
         opacity: 0;
         transform: scale(0.95);
-        transition: opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-          transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        /* Faster transition with ease-out for smooth entry from outside */
+        transition: opacity 0.4s ease-in, transform 0.4s ease-in;
         will-change: opacity, transform;
+        /* background-color: #ffffff; */
       }
 
       .bid-card.anim-left {
-        transform: translateX(-40px) scale(0.95);
+        /* Start further outside (~120% of screen width) */
+        transform: translateX(-120vw) scale(0.95);
       }
       .bid-card.anim-right {
-        transform: translateX(40px) scale(0.95);
+        /* Start further outside (~120% of screen width) */
+        transform: translateX(120vw) scale(0.95);
       }
 
       .bid-card:last-child {
@@ -302,7 +316,7 @@
       .bid-card.unread::after {
         content: "";
         position: absolute;
-        right: 0;
+        right: 5%;
         top: 20%;
         transform: translateY(-50%);
         width: 8px;
@@ -636,8 +650,8 @@
           unread: false,
         },
       ];
-      const ANIMATION_START_DELAY = 500;
-      const DELAY_BETWEEN_BIDS = 400;
+      const ANIMATION_START_DELAY = 300;
+      const DELAY_BETWEEN_BIDS = 250;
 
       // --- Theme Management ---
       function setTheme(theme) {
@@ -688,20 +702,80 @@
 
       async function animateInbox() {
         const messageList = document.getElementById("message-list");
+        const phoneContainer = document.getElementById("phone-1");
+
+        // Ensure animation layer exists
+        let animLayer = phoneContainer.querySelector(".animation-layer");
+        if (!animLayer) {
+          animLayer = document.createElement("div");
+          animLayer.className = "animation-layer";
+          phoneContainer.appendChild(animLayer);
+        }
+
         if (!messageList) return;
 
         await sleep(ANIMATION_START_DELAY);
 
         for (const [index, bid] of bids.entries()) {
-          const card = createBidCard(bid);
-          if (index % 2 === 0) {
-            card.classList.add("anim-left");
-          } else {
-            card.classList.add("anim-right");
-          }
-          messageList.appendChild(card);
-          await sleep(50);
-          card.classList.add("is-visible");
+          // 1. Create invisible placeholder in the list to reserve space
+          const realCard = createBidCard(bid);
+          // Ensure it's invisible but takes up space
+          realCard.style.opacity = "0";
+          realCard.style.visibility = "hidden";
+          // Remove transitions on real card so it doesn't interfere later
+          realCard.style.transition = "none";
+          realCard.style.transform = "none";
+
+          messageList.appendChild(realCard);
+
+          // 2. Measure position relative to phone container
+          const rect = realCard.getBoundingClientRect();
+          const containerRect = phoneContainer.getBoundingClientRect();
+
+          const top = rect.top - containerRect.top;
+          const left = rect.left - containerRect.left;
+          const width = rect.width;
+          const height = rect.height;
+
+          // 3. Create a clone for the flying animation
+          const clone = realCard.cloneNode(true);
+          // Reset styles for the clone to be visible and absolute
+          clone.style.opacity = "1";
+          clone.style.visibility = "visible";
+          clone.style.position = "absolute";
+          clone.style.top = `${top}px`;
+          clone.style.left = `${left}px`;
+          clone.style.width = `${width}px`;
+          clone.style.height = `${height}px`;
+          clone.style.margin = "0";
+          clone.style.zIndex = "60"; // Above everything
+          // Faster transition with bounce effect (cubic-bezier > 1 creates overshoot)
+          clone.style.transition =
+            "transform 0.5s cubic-bezier(0.34, 1.25, 0.64, 1)";
+
+          // 4. Set initial position (outside the phone)
+          // Start further out to clear the bezel completely
+          const offset = window.innerWidth * 1.2;
+          // Always start from right (+offset)
+          const startX = offset;
+
+          clone.style.transform = `translateX(${startX}px) scale(0.95)`;
+
+          animLayer.appendChild(clone);
+
+          // Force reflow to apply initial state
+          clone.getBoundingClientRect();
+
+          // 5. Animate to final position
+          clone.style.transform = "translateX(0) scale(1)";
+
+          // 6. Cleanup after animation
+          setTimeout(() => {
+            clone.remove();
+            realCard.style.opacity = "1";
+            realCard.style.visibility = "visible";
+          }, 500); // Match transition duration
+
           await sleep(DELAY_BETWEEN_BIDS);
         }
 

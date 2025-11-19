@@ -1129,6 +1129,7 @@
 
             // Add classes to trigger animations
             mainContainer.classList.add("main-container-animating");
+            mainContainer.classList.add("fade-out");
             homeMainForm.classList.add("fade-out-left");
             frameShell.classList.add("fade-out-right");
             searchShell.classList.add("fade-out");
@@ -1140,6 +1141,7 @@
                 event.target.style.display = "none";
                 animationEndCount++;
                 if (animationEndCount === 3) {
+                  mainContainer.style.display = "none";
                   const placeholder =
                     document.getElementById("inbox-placeholder");
                   if (placeholder) {
@@ -1301,7 +1303,7 @@
         );
 
         // --- Animation Orchestration ---
-        const phaseOneDelay = 12000;
+        const phaseOneDelay = 1000;
         const phaseOneDuration = ANIMATION_DURATION;
         const phaseTwoDelay =
           phaseOneDelay + phaseOneDuration + PAUSE_BETWEEN_PHASES;
