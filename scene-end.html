@@ -33,6 +33,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        transform: scale(1.5); /* Scale up all content */
       }
 
       .text-element {
@@ -46,16 +47,18 @@
       /* Phase 1 Container */
       #phase-1 {
         display: flex;
-        gap: 0.5rem;
-        align-items: center;
+        gap: 1rem;
+        align-items: baseline;
         justify-content: center;
+        opacity: 0;
       }
 
       .word {
         font-size: 5rem; /* Large text */
         font-weight: 800;
         opacity: 0; /* Start hidden */
-        transform: translateY(20px);
+        transform: translateY(24px);
+        filter: blur(10px);
       }
 
       /* Phase 2 */
@@ -63,6 +66,12 @@
         font-size: 6rem;
         font-weight: 800;
         opacity: 0;
+      }
+
+      #question-mark {
+        display: inline-block; /* Allows for transform */
+        transform-origin: bottom left;
+        opacity: 0; /* Initially hidden */
       }
 
       /* Phase 3 */
@@ -75,20 +84,37 @@
         /* Initial layout: Icon Left, Text Right */
       }
 
+      #logo-icon-wrapper {
+        position: relative;
+        z-index: 2;
+        will-change: transform; /* Performance optimization for animations */
+      }
+
+      #logo-icon-wrapper::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 100%;
+        width: 100vw;
+        height: 100%;
+        background-color: #ffffff;
+      }
+
       #logo-icon {
         width: 150px;
         height: 150px;
-        z-index: 2; /* On top of text */
-        position: relative;
+        display: block;
       }
 
       #logo-text {
-        height: 50px; /* Proportional to icon roughly */
+        height: 70px; /* Proportional to icon roughly */
         margin-left: 20px;
         z-index: 1; /* Behind icon */
         position: relative;
       }
-
+      .blue-text {
+        color: #0f81c0;
+      }
       /* Helper to center absolute elements */
       .absolute-center {
         position: absolute;
@@ -102,17 +128,27 @@
     <div id="container">
       <!-- Phase 1: Let Them Bid -->
       <div id="phase-1" class="absolute-center">
-        <div class="word" id="word-let">Let</div>
-        <div class="word" id="word-them">Them</div>
-        <div class="word" id="word-bid">Bid</div>
+        <div class="word" id="word-let">
+          <span class="blue-text">L</span>et.
+        </div>
+        <div class="word" id="word-them">
+          <span class="blue-text">T</span>hem.
+        </div>
+        <div class="word" id="word-bid">
+          <span class="blue-text">B</span>id.
+        </div>
       </div>
 
       <!-- Phase 2: Room? -->
-      <div id="phase-2-text" class="absolute-center">Room?</div>
+      <div id="phase-2-text" class="absolute-center">
+        Room<span id="question-mark" class="blue-text">?</span>
+      </div>
 
       <!-- Phase 3: Logo Reveal -->
       <div id="logo-container" class="absolute-center">
-        <img src="Assets/logo-icon.svg" id="logo-icon" alt="BidMyRoom Icon" />
+        <div id="logo-icon-wrapper">
+          <img src="Assets/logo-icon.svg" id="logo-icon" alt="BidMyRoom Icon" />
+        </div>
         <img src="Assets/logo-text.svg" id="logo-text" alt="BidMyRoom Text" />
       </div>
     </div>
@@ -122,47 +158,66 @@
         gsap.registerPlugin();
 
         const tl = gsap.timeline({
-          defaults: { ease: "power2.out" },
+          defaults: { ease: "power3.out" },
+          delay: 4, // Initial delay before the animation starts
         });
 
         // --- Phase 1: "Let... Them... Bid" ---
-        // Rhythm: "Let" (pause) "Them" (pause) "Bid"
+        // Rhythm: Let (pause) Them (pause) Bid
 
-        // 1. "Let" appears
-        tl.to("#word-let", {
-          opacity: 1,
-          y: 0,
-          duration: 0.5,
-        });
+        // Bring the group in slightly
+        tl.to(
+          "#phase-1",
+          {
+            opacity: 1,
+            duration: 0.2,
+          },
+          "-=0.7"
+        );
 
-        // Pause
-        tl.to({}, { duration: 0.4 });
+        // "Let"
+        tl.to(
+          "#word-let",
+          {
+            opacity: 1,
+            y: 0,
+            filter: "blur(0px)",
+            duration: 0.45,
+          },
+          "-=0.1"
+        );
 
-        // 2. "Them" appears
+        // Pause – matches the little vocal gap
+        tl.to({}, { duration: 0.35 });
+
+        // "Them"
         tl.to("#word-them", {
           opacity: 1,
           y: 0,
-          duration: 0.5,
+          filter: "blur(0px)",
+          duration: 0.45,
         });
 
         // Pause
-        tl.to({}, { duration: 0.4 });
+        tl.to({}, { duration: 0.35 });
 
-        // 3. "Bid" appears
+        // "Bid"
         tl.to("#word-bid", {
           opacity: 1,
           y: 0,
-          duration: 0.5,
+          filter: "blur(0px)",
+          duration: 0.45,
         });
 
-        // Hold Phase 1 briefly
-        tl.to({}, { duration: 0.8 });
+        // Hold the full phrase on screen a bit
+        tl.to({}, { duration: 0.9 });
 
         // Fade out Phase 1
         tl.to("#phase-1", {
           opacity: 0,
-          scale: 0.9,
-          duration: 0.4,
+          scale: 0.96,
+          duration: 0.45,
+          ease: "power2.inOut",
           onComplete: () => {
             document.querySelector("#phase-1").style.display = "none";
           },
@@ -180,8 +235,26 @@
           "-=0.1"
         ); // slightly overlap with fade out
 
-        // Hold Phase 2
-        tl.to({}, { duration: 1.0 });
+        // Animate the question mark to fade in and perform a smooth animation
+        tl.to(
+          "#question-mark",
+          {
+            opacity: 1,
+            scale: 1.2,
+            rotation: -5,
+            duration: 0.3,
+            ease: "power2.out",
+          },
+          "+=0.2" // Wait briefly after "Room" appears
+        ).to("#question-mark", {
+          scale: 1,
+          rotation: 0,
+          duration: 0.4,
+          ease: "power2.inOut",
+        });
+
+        // Hold after animation before fading out
+        tl.to({}, { duration: 0.5 });
 
         // Fade out Phase 2
         tl.to("#phase-2-text", {
@@ -196,7 +269,7 @@
 
         // 5. Show Logo Icon and Text
         // Let's have them fade in or pop in
-        tl.from(["#logo-icon", "#logo-text"], {
+        tl.from(["#logo-icon-wrapper", "#logo-text"], {
           opacity: 0,
           y: 20,
           duration: 0.6,
@@ -209,7 +282,7 @@
         // 6. Animation: Text goes left disappearing behind Logo, Logo centers
         // Dynamic calculation to ensure perfect centering
 
-        const icon = document.querySelector("#logo-icon");
+        const icon = document.querySelector("#logo-icon-wrapper");
         const text = document.querySelector("#logo-text");
         const container = document.querySelector("#logo-container");
 
@@ -239,17 +312,19 @@
           // Screen center x (which is also container center approx if absolute centered)
           const screenCenterX = window.innerWidth / 2;
 
-          const shiftNeeded = screenCenterX - iconCenterX;
+          const scaleFactor = 1.5;
+          const shiftNeeded = (screenCenterX - iconCenterX) / scaleFactor;
 
           // Animate Icon to shiftNeeded
           // Wait, we are animating 'x' property.
           // If we animate just the icon, it moves relative to its flex position?
           // Yes, transform x applies after layout.
 
-          gsap.to("#logo-icon", {
+          gsap.to("#logo-icon-wrapper", {
             x: shiftNeeded,
+            scale: 1.3, // Simultaneously scale up
             duration: 1.0,
-            ease: "power2.inOut",
+            ease: "power1.inOut",
           });
 
           // Text moves left and fades
@@ -264,20 +339,6 @@
         // Add a dummy tween to the timeline to occupy the duration of the dynamic animation
         // so the next steps wait for it.
         tl.to({}, { duration: 1.0 });
-
-        // 7. Bounce Effect on Logo
-        // "Logo will have Some Small bounce gets bit bigger and than normal"
-        tl.to("#logo-icon", {
-          scale: 1.1,
-          duration: 0.2,
-          ease: "power1.out",
-        });
-
-        tl.to("#logo-icon", {
-          scale: 1.0,
-          duration: 0.5,
-          ease: "elastic.out(1, 0.3)",
-        });
       });
     </script>
   </body>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BidMyRoom End Scene - Final Concept</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: #ffffff;
+        font-family: "Montserrat", sans-serif;
+        font-weight: 900;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #1a1a1a;
+      }
+
+      .absolute-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      #animation-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      /* Phase 1 */
+      #phase-1 {
+        display: flex;
+        gap: 1.5rem;
+        font-size: 5rem;
+        perspective: 1000px;
+      }
+
+      .word {
+        display: flex;
+      }
+
+      .char {
+        display: inline-block;
+        opacity: 0; /* Initially hidden */
+        will-change: transform, opacity;
+      }
+
+      .blue-text {
+        color: #0f81c0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="animation-container">
+      <!-- Phase 1: Let Them Bid -->
+      <div id="phase-1" class="absolute-center">
+        <div class="word" id="word-let">
+          <span class="char blue-text">L</span><span class="char">e</span
+          ><span class="char">t</span><span class="char">.</span>
+        </div>
+        <div class="word" id="word-them">
+          <span class="char blue-text">T</span><span class="char">h</span
+          ><span class="char">e</span><span class="char">m</span
+          ><span class="char">.</span>
+        </div>
+        <div class="word" id="word-bid">
+          <span class="char blue-text">B</span><span class="char">i</span
+          ><span class="char">d</span><span class="char">.</span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+        gsap.registerPlugin();
+
+        const tl = gsap.timeline({
+          defaults: { ease: "power4.out" },
+          delay: 0.5,
+        });
+
+        // --- Phase 1: Character Assembly ---
+        const chars = document.querySelectorAll("#phase-1 .char");
+
+        // Set initial random positions for characters
+        gsap.set(chars, {
+          y: () => gsap.utils.random(-200, 200),
+          x: () => gsap.utils.random(-200, 200),
+          rotation: () => gsap.utils.random(-360, 360),
+          scale: 0,
+        });
+
+        tl.to(chars, {
+          duration: 1.2,
+          opacity: 1,
+          y: 0,
+          x: 0,
+          rotation: 0,
+          scale: 1,
+          stagger: {
+            each: 0.08,
+            from: "random",
+          },
+          ease: "back.out(1.4)",
+        });
+
+        // Hold the phrase
+        tl.to({}, { duration: 1.5 });
+      });
+    </script>
+  </body>
+</html>
