@@ -68,12 +68,6 @@
         opacity: 0;
       }
 
-      #question-mark {
-        display: inline-block; /* Allows for transform */
-        transform-origin: bottom left;
-        opacity: 0; /* Initially hidden */
-      }
-
       /* Phase 3 */
       #logo-container {
         position: absolute;
@@ -140,9 +134,7 @@
       </div>
 
       <!-- Phase 2: Room? -->
-      <div id="phase-2-text" class="absolute-center">
-        Room<span id="question-mark" class="blue-text">?</span>
-      </div>
+      <div id="phase-2-text" class="absolute-center">Room?</div>
 
       <!-- Phase 3: Logo Reveal -->
       <div id="logo-container" class="absolute-center">
@@ -159,7 +151,7 @@
 
         const tl = gsap.timeline({
           defaults: { ease: "power3.out" },
-          delay: 4, // Initial delay before the animation starts
+          delay: 6, // Initial delay before the animation starts
         });
 
         // --- Phase 1: "Let... Them... Bid" ---
@@ -234,24 +226,6 @@
           },
           "-=0.1"
         ); // slightly overlap with fade out
-
-        // Animate the question mark to fade in and perform a smooth animation
-        tl.to(
-          "#question-mark",
-          {
-            opacity: 1,
-            scale: 1.2,
-            rotation: -5,
-            duration: 0.3,
-            ease: "power2.out",
-          },
-          "+=0.2" // Wait briefly after "Room" appears
-        ).to("#question-mark", {
-          scale: 1,
-          rotation: 0,
-          duration: 0.4,
-          ease: "power2.inOut",
-        });
 
         // Hold after animation before fading out
         tl.to({}, { duration: 0.5 });
