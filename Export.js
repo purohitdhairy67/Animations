@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 const path = require("path");
 
-const filename = "scene-end.html";
+const filename = "search_instead.html";
 const outputFilename = filename.replace(".html", ".mp4");
 
 (async () => {
