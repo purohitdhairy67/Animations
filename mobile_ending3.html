@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BidMyRoom — Mobile Ending v3 (Combined)</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap");
+
+      :root {
+        --brand: #0f81c0;
+        --brand-deep: #0a5a87;
+        --cream-top: #f7f1e6;
+        --cream-bottom: #ecdfc7;
+        --ink: #0f81c0;
+        --ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+        --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+        --ease-expo: cubic-bezier(0.87, 0, 0.13, 1);
+        --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: "Poppins", sans-serif;
+        background: var(--cream-top);
+        color: var(--ink);
+      }
+
+      .stage {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        background: linear-gradient(
+          180deg,
+          var(--cream-top) 0%,
+          var(--cream-bottom) 100%
+        );
+      }
+
+      .intro-fade {
+        position: absolute;
+        inset: 0;
+        background: var(--cream-top);
+        opacity: 1;
+        animation: intro-out 0.9s var(--ease-out) forwards;
+        z-index: 10;
+      }
+
+      @keyframes intro-out {
+        to { opacity: 0; }
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 0 8vw;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .scene.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      /* -------- Scene 1: masked line slide-up -------- */
+      .tagline {
+        font-size: 7.6vw;
+        font-weight: 700;
+        line-height: 1.25;
+        text-align: center;
+        letter-spacing: -0.01em;
+        max-width: 85vw;
+      }
+
+      .tagline .word {
+        display: inline-block;
+        overflow: hidden;
+        vertical-align: bottom;
+        padding-bottom: 0.15em;
+        margin-bottom: -0.15em;
+      }
+
+      .tagline .word .inner {
+        display: inline-block;
+        transform: translateY(115%);
+        opacity: 0;
+      }
+
+      #scene-1.active .tagline .word .inner {
+        animation: line-rise 0.85s var(--ease-out) forwards;
+      }
+
+      #scene-1.active .tagline .word:nth-of-type(1) .inner { animation-delay: 0.10s; }
+      #scene-1.active .tagline .word:nth-of-type(2) .inner { animation-delay: 0.22s; }
+      #scene-1.active .tagline .word:nth-of-type(3) .inner { animation-delay: 0.34s; }
+      #scene-1.active .tagline .word:nth-of-type(4) .inner { animation-delay: 0.46s; }
+
+      @keyframes line-rise {
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      /* Scene 1 fade-out exit */
+      #scene-1.fade-out {
+        animation: scene-fade-out 0.6s var(--ease-smooth) forwards;
+      }
+
+      @keyframes scene-fade-out {
+        to {
+          opacity: 0;
+        }
+      }
+
+      /* -------- Scene 2: Morphing "Room?" → Logo + BidMyRoom -------- */
+      #scene-2 {
+        justify-content: center;
+        align-items: center;
+      }
+
+      /* Main brand container */
+      .brand-morph {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Logo + Text row */
+      .brand-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2.5vw;
+      }
+
+      /* Logo icon - hidden initially, fades in */
+      .logo-icon {
+        width: 11vw;
+        height: 11vw;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        max-width: 0;
+        overflow: hidden;
+        transform: scale(0.8);
+        filter: drop-shadow(0 6px 16px rgba(15, 129, 192, 0.2));
+        transition: opacity 0.8s var(--ease-smooth),
+                    transform 0.8s var(--ease-smooth),
+                    max-width 0.8s var(--ease-smooth),
+                    margin 0.8s var(--ease-smooth);
+        margin-right: 0;
+      }
+
+      .logo-icon img {
+        width: 11vw;
+        height: 11vw;
+        display: block;
+        border-radius: 22%;
+      }
+
+      .logo-icon.visible {
+        opacity: 1;
+        max-width: 11vw;
+        transform: scale(1);
+        margin-right: 2.5vw;
+      }
+
+      /* The morphing text container - centered by default */
+      .morph-text {
+        display: flex;
+        align-items: baseline;
+        font-size: 11vw;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: var(--ink);
+      }
+
+      /* "BidMy" prefix - starts with 0 width, expands smoothly */
+      .prefix {
+        display: flex;
+        overflow: hidden;
+        max-width: 0;
+        transition: max-width 0.85s var(--ease-smooth);
+      }
+
+      .prefix.visible {
+        max-width: 40vw;
+      }
+
+      .prefix .char {
+        display: inline-block;
+        opacity: 0;
+        transform: translateX(-12px);
+        transition: transform 0.5s var(--ease-out), opacity 0.4s var(--ease-out);
+      }
+
+      .prefix.visible .char {
+        transform: translateX(0);
+        opacity: 1;
+      }
+
+      .prefix.visible .char:nth-child(1) { transition-delay: 0.12s; }
+      .prefix.visible .char:nth-child(2) { transition-delay: 0.18s; }
+      .prefix.visible .char:nth-child(3) { transition-delay: 0.24s; }
+      .prefix.visible .char:nth-child(4) { transition-delay: 0.30s; }
+      .prefix.visible .char:nth-child(5) { transition-delay: 0.36s; }
+
+      /* "Room" text - always visible, stays in place */
+      .room-text {
+        display: flex;
+      }
+
+      .room-text .char {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(22px);
+        transition: transform 0.5s var(--ease-back), opacity 0.4s var(--ease-out);
+      }
+
+      .room-text.visible .char {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .room-text.visible .char:nth-child(1) { transition-delay: 0.05s; }
+      .room-text.visible .char:nth-child(2) { transition-delay: 0.10s; }
+      .room-text.visible .char:nth-child(3) { transition-delay: 0.15s; }
+      .room-text.visible .char:nth-child(4) { transition-delay: 0.20s; }
+
+      /* Question mark - fades out smoothly */
+      .qmark {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(22px);
+        transition: transform 0.5s var(--ease-back), opacity 0.4s var(--ease-out);
+        transition-delay: 0.25s;
+      }
+
+      .qmark.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .qmark.fade-out {
+        opacity: 0;
+        transform: scale(0.85) translateY(-6px);
+        transition: transform 0.6s var(--ease-smooth), opacity 0.5s var(--ease-smooth);
+        transition-delay: 0s;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <div class="intro-fade"></div>
+
+      <!-- Scene 1: masked line slide-up tagline -->
+      <div class="scene" id="scene-1">
+        <h1 class="tagline">
+          <span class="word"><span class="inner">It</span></span>&nbsp;<span class="word"><span class="inner">deserves</span></span><br />
+          <span class="word"><span class="inner">its</span></span>&nbsp;<span class="word"><span class="inner">space.</span></span>
+        </h1>
+      </div>
+
+      <!-- Scene 2: Morphing Room? → BidMyRoom -->
+      <div class="scene" id="scene-2">
+        <div class="brand-morph">
+          <div class="brand-row">
+            <!-- Logo - fades in during morph -->
+            <div class="logo-icon" id="logo">
+              <img src="Assets/logo-icon.svg" alt="BidMyRoom" />
+            </div>
+
+            <!-- Morphing text -->
+            <div class="morph-text">
+              <!-- "BidMy" prefix - hidden initially, slides in -->
+              <span class="prefix" id="prefix">
+                <span class="char">B</span><span class="char">i</span><span class="char">d</span><span class="char">M</span><span class="char">y</span>
+              </span>
+              <!-- "Room" - always present -->
+              <span class="room-text" id="room">
+                <span class="char">R</span><span class="char">o</span><span class="char">o</span><span class="char">m</span>
+              </span>
+              <!-- "?" - fades out during morph -->
+              <span class="qmark" id="qmark">?</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const START_DELAY = 35000;
+
+      const s1 = document.getElementById("scene-1");
+      const s2 = document.getElementById("scene-2");
+      const room = document.getElementById("room");
+      const qmark = document.getElementById("qmark");
+      const prefix = document.getElementById("prefix");
+      const logo = document.getElementById("logo");
+
+      window.addEventListener("load", () => {
+        // --- Scene 1: Tagline animation
+        setTimeout(() => s1.classList.add("active"), START_DELAY + 150);
+
+        // Fade out scene 1
+        setTimeout(() => s1.classList.add("fade-out"), START_DELAY + 2100);
+
+        // --- Scene 2: Morphing animation
+        // Show scene 2
+        setTimeout(() => s2.classList.add("active"), START_DELAY + 2500);
+
+        // Step 1: "Room?" appears centered
+        setTimeout(() => {
+          room.classList.add("visible");
+        }, START_DELAY + 2650);
+
+        // Step 2: "?" appears with slight delay
+        setTimeout(() => {
+          qmark.classList.add("visible");
+        }, START_DELAY + 2900);
+
+        // Hold "Room?" for a moment...
+
+        // Step 3: Begin the morph - "?" starts fading out
+        setTimeout(() => {
+          qmark.classList.remove("visible");
+          qmark.classList.add("fade-out");
+        }, START_DELAY + 3800);
+
+        // Step 4: Logo fades in and "BidMy" slides in together
+        setTimeout(() => {
+          logo.classList.add("visible");
+          prefix.classList.add("visible");
+        }, START_DELAY + 3900);
+      });
+    </script>
+  </body>
+</html>

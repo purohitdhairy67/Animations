@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BidMyRoom — Mobile Ending v2</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap");
+
+      :root {
+        --brand: #0f81c0;
+        --brand-deep: #0a5a87;
+        --cream-top: #f7f1e6;
+        --cream-bottom: #ecdfc7;
+        --ink: #0f81c0;
+        --ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+        --ease-elastic: cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+        --ease-expo: cubic-bezier(0.87, 0, 0.13, 1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: "Poppins", sans-serif;
+        background: var(--cream-top);
+        color: var(--ink);
+      }
+
+      .stage {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        background: linear-gradient(
+          180deg,
+          var(--cream-top) 0%,
+          var(--cream-bottom) 100%
+        );
+        perspective: 1200px;
+      }
+
+      .intro-fade {
+        position: absolute;
+        inset: 0;
+        background: var(--cream-top);
+        opacity: 1;
+        animation: intro-out 0.9s var(--ease-out) forwards;
+        z-index: 10;
+      }
+
+      @keyframes intro-out {
+        to { opacity: 0; }
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 0 8vw;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .scene.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      #scene-2 {
+        transition: opacity 0.5s ease;
+      }
+
+      /* -------- Scene 1: masked line slide-up -------- */
+      .tagline {
+        font-size: 7.6vw;
+        font-weight: 700;
+        line-height: 1.25;
+        text-align: center;
+        letter-spacing: -0.01em;
+        max-width: 85vw;
+      }
+
+      .tagline .word {
+        display: inline-block;
+        overflow: hidden;
+        vertical-align: bottom;
+        padding-bottom: 0.15em;
+        margin-bottom: -0.15em;
+      }
+
+      .tagline .word .inner {
+        display: inline-block;
+        transform: translateY(115%);
+        opacity: 0;
+      }
+
+      #scene-1.active .tagline .word .inner {
+        animation: line-rise 0.85s var(--ease-out) forwards;
+      }
+
+      #scene-1.active .tagline .word:nth-of-type(1) .inner { animation-delay: 0.10s; }
+      #scene-1.active .tagline .word:nth-of-type(2) .inner { animation-delay: 0.22s; }
+      #scene-1.active .tagline .word:nth-of-type(3) .inner { animation-delay: 0.34s; }
+      #scene-1.active .tagline .word:nth-of-type(4) .inner { animation-delay: 0.46s; }
+
+      @keyframes line-rise {
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      /* Scene 1 iris-close exit */
+      #scene-1.iris-close {
+        animation: iris-close 0.6s var(--ease-expo) forwards;
+      }
+
+      @keyframes iris-close {
+        0% {
+          clip-path: circle(120% at 50% 50%);
+          opacity: 1;
+        }
+        100% {
+          clip-path: circle(0% at 50% 50%);
+          opacity: 1;
+        }
+      }
+
+      /* -------- Scene 2: Room? — letter drop + ? punch -------- */
+      #scene-2 {
+        transform-style: preserve-3d;
+      }
+
+      .room-q {
+        font-size: 15vw;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: var(--ink);
+        display: inline-flex;
+        align-items: baseline;
+      }
+
+      .room-q .rl {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(-110%) scale(1.1);
+        transform-origin: center bottom;
+      }
+
+      #scene-2.active .room-q .rl {
+        animation: letter-drop 0.6s var(--ease-back) 0.05s forwards;
+      }
+
+      @keyframes letter-drop {
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      .room-q .qmark {
+        display: inline-block;
+        opacity: 0;
+        transform: scale(0.3) rotate(-20deg);
+        transform-origin: center 70%;
+        margin-left: 0.05em;
+      }
+
+      #scene-2.active .room-q .qmark {
+        animation: qmark-punch 0.55s var(--ease-back) 0.35s forwards;
+      }
+
+      @keyframes qmark-punch {
+        to {
+          opacity: 1;
+          transform: scale(1) rotate(0);
+        }
+      }
+
+      /* Scene 2 iris-open entry */
+      #scene-2.iris-open {
+        animation: iris-open 0.6s var(--ease-expo) forwards;
+      }
+
+      @keyframes iris-open {
+        0% {
+          clip-path: circle(0% at 50% 50%);
+          opacity: 1;
+        }
+        100% {
+          clip-path: circle(120% at 50% 50%);
+          opacity: 1;
+        }
+      }
+
+      /* Scene 2 zoom-blur exit */
+      #scene-2.zoom-out .room-q {
+        animation: zoom-blur-out 0.55s var(--ease-expo) forwards;
+      }
+
+      @keyframes zoom-blur-out {
+        to {
+          opacity: 0;
+          transform: scale(1.6);
+          filter: blur(16px);
+        }
+      }
+
+      /* -------- Scene 3: logo lockup (UNCHANGED from mobile_ending.html) -------- */
+      #scene-3 {
+        gap: 4vh;
+      }
+
+      .lockup {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3vw;
+      }
+
+      .logo-icon {
+        width: 14vw;
+        height: 14vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transform: translateX(-50vw) rotate(-25deg) scale(0.6);
+        filter: drop-shadow(0 10px 24px rgba(15, 129, 192, 0.25));
+      }
+
+      .logo-icon img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        border-radius: 22%;
+      }
+
+      #scene-3.active .logo-icon {
+        animation: icon-swoop 0.75s var(--ease-out) forwards;
+      }
+
+      @keyframes icon-swoop {
+        65% {
+          opacity: 1;
+          transform: translateX(0) rotate(4deg) scale(1.08);
+        }
+        100% {
+          opacity: 1;
+          transform: translateX(0) rotate(0) scale(1);
+        }
+      }
+
+      .wordmark {
+        font-size: 10vw;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--ink);
+        display: flex;
+        overflow: hidden;
+      }
+
+      .wordmark .letter {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(100%);
+      }
+
+      #scene-3.active .wordmark .letter {
+        animation: letter-in 0.4s var(--ease-out) forwards;
+      }
+
+      #scene-3.active .wordmark .letter:nth-child(1) { animation-delay: 0.55s; }
+      #scene-3.active .wordmark .letter:nth-child(2) { animation-delay: 0.60s; }
+      #scene-3.active .wordmark .letter:nth-child(3) { animation-delay: 0.65s; }
+      #scene-3.active .wordmark .letter:nth-child(4) { animation-delay: 0.70s; }
+      #scene-3.active .wordmark .letter:nth-child(5) { animation-delay: 0.75s; }
+      #scene-3.active .wordmark .letter:nth-child(6) { animation-delay: 0.80s; }
+      #scene-3.active .wordmark .letter:nth-child(7) { animation-delay: 0.85s; }
+      #scene-3.active .wordmark .letter:nth-child(8) { animation-delay: 0.90s; }
+      #scene-3.active .wordmark .letter:nth-child(9) { animation-delay: 0.95s; }
+
+      @keyframes letter-in {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .tag-small {
+        font-size: 3vw;
+        font-weight: 500;
+        letter-spacing: 0.35em;
+        text-transform: uppercase;
+        color: rgba(15, 129, 192, 0.65);
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      #scene-3.active .tag-small {
+        animation: tag-in 0.55s var(--ease-out) 1.25s forwards;
+      }
+
+      @keyframes tag-in {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Scene 3 gentle zoom-in entry (wraps the existing letter animations) */
+      #scene-3 {
+        transform: scale(1.04);
+        transition: transform 0.7s var(--ease-out);
+      }
+      #scene-3.active {
+        transform: scale(1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <div class="intro-fade"></div>
+
+      <!-- Scene 1: masked line slide-up tagline -->
+      <div class="scene" id="scene-1">
+        <h1 class="tagline">
+          <span class="word"><span class="inner">It</span></span>&nbsp;<span class="word"><span class="inner">deserves</span></span><br />
+          <span class="word"><span class="inner">its</span></span>&nbsp;<span class="word"><span class="inner">space.</span></span>
+        </h1>
+      </div>
+
+      <!-- Scene 2: Room? — letter drop + ? punch -->
+      <div class="scene" id="scene-2">
+        <h1 class="room-q">
+          <span class="rl">R</span><span class="rl">o</span><span class="rl">o</span><span class="rl">m</span><span class="qmark">?</span>
+        </h1>
+      </div>
+
+      <!-- Scene 3: logo lockup (unchanged) -->
+      <div class="scene" id="scene-3">
+        <div class="lockup">
+          <div class="logo-icon">
+            <img src="Assets/logo-icon.svg" alt="BidMyRoom" />
+          </div>
+          <div class="wordmark">
+            <span class="letter">B</span>
+            <span class="letter">i</span>
+            <span class="letter">d</span>
+            <span class="letter">M</span>
+            <span class="letter">y</span>
+            <span class="letter">R</span>
+            <span class="letter">o</span>
+            <span class="letter">o</span>
+            <span class="letter">m</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const START_DELAY = 35000;
+
+      const s1 = document.getElementById("scene-1");
+      const s2 = document.getElementById("scene-2");
+      const s3 = document.getElementById("scene-3");
+
+      window.addEventListener("load", () => {
+        // --- Scene 1: flying tagline (4 words, last word settles ~1.17s)
+        setTimeout(() => s1.classList.add("active"), START_DELAY + 150);
+        // hold ~0.8s after last word lands, then iris close
+        setTimeout(() => s1.classList.add("iris-close"), START_DELAY + 2100);
+
+        // --- Scene 2: plain fade + letter drop + ? punch
+        setTimeout(() => {
+          s2.classList.add("active");
+        }, START_DELAY + 2550);
+        // zoom-blur out
+        setTimeout(() => s2.classList.add("zoom-out"), START_DELAY + 4100);
+
+        // --- Scene 3: logo lockup (unchanged)
+        setTimeout(() => s3.classList.add("active"), START_DELAY + 4550);
+      });
+    </script>
+  </body>
+</html>

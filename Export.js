@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 const { PuppeteerScreenRecorder } = require("puppeteer-screen-recorder");
 const path = require("path");
 
-const filename = "scene-end.html";
+const filename = "mobile_ending3.html";
 const outputFilename = filename.replace(".html", ".mp4");
 
 (async () => {
@@ -11,8 +11,8 @@ const outputFilename = filename.replace(".html", ".mp4");
   await page.goto(`file://${path.join(__dirname, filename)}`, {
     waitUntil: "networkidle0",
   });
-  // await page.setViewport({ width: 2000, height: 2000 });
-  await page.setViewport({ width: 1920, height: 1080 });
+  // Mobile portrait (9:16) for the BidMyRoom mobile ending
+  await page.setViewport({ width: 1080, height: 1920, deviceScaleFactor: 1 });
 
   // // Wait for the Macbook skin image to load
   // await page.evaluate(() => {
@@ -36,8 +36,8 @@ const outputFilename = filename.replace(".html", ".mp4");
   });
   await recorder.start(outputFilename);
 
-  // Let animation run
-  await new Promise((resolve) => setTimeout(resolve, 20000));
+  // Let animation run (35s lead-in + ~6.5s scenes + ~1.5s tail hold)
+  await new Promise((resolve) => setTimeout(resolve, 43000));
 
   await recorder.stop();
   await browser.close();
