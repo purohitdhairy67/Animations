@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ad 2 - Life Journey - Preview</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+    :root {
+      --brand: #0f81c0;
+      --white: #ffffff;
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 20px;
+      gap: 30px;
+    }
+
+    .video-frame {
+      width: 800px;
+      height: 450px;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 0 0 4px #333;
+    }
+
+    .stage {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* Video layer */
+    #videoLayer {
+      position: absolute;
+      inset: 0;
+      background: #000;
+    }
+
+    #videoLayer video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Calm background overlay - brand blue */
+    .calm-overlay {
+      position: absolute;
+      inset: 0;
+      background: #0f81c0;
+      opacity: 0;
+      transition: opacity 1.2s var(--ease-smooth);
+    }
+
+    .calm-overlay.active {
+      opacity: 1;
+    }
+
+    /* Subtle blur layer */
+    .blur-overlay {
+      position: absolute;
+      inset: 0;
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      opacity: 0;
+      transition: opacity 0.6s var(--ease-smooth);
+    }
+
+    .blur-overlay.active {
+      opacity: 1;
+    }
+
+    /* "Life moves fast." text */
+    .life-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .life-text.active {
+      opacity: 1;
+    }
+
+    .life-text h1 {
+      font-family: "Inter", -apple-system, sans-serif;
+      font-size: 51px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.95);
+      text-align: center;
+      letter-spacing: -0.01em;
+      line-height: 1.5;
+      padding: 0 40px;
+    }
+
+    .life-text .word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(30px);
+      filter: blur(8px);
+    }
+
+    .life-text.active .word {
+      animation: word-fade-in 0.8s var(--ease-out) forwards;
+    }
+
+    .life-text.active .word:nth-child(1) { animation-delay: 0.0s; }
+    .life-text.active .word:nth-child(2) { animation-delay: 0.15s; }
+    .life-text.active .word:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes word-fade-in {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+      }
+    }
+
+    .life-text.fade-out .word {
+      animation: word-fade-out 0.5s var(--ease-smooth) forwards;
+    }
+
+    @keyframes word-fade-out {
+      to {
+        opacity: 0;
+        transform: translateY(-20px);
+        filter: blur(4px);
+      }
+    }
+
+    /* Clip captions - bottom of video during clips phase */
+    .clip-caption-layer {
+      position: absolute;
+      bottom: 50px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      padding: 0 30px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .clip-caption-layer.active {
+      opacity: 1;
+    }
+
+    .clip-caption {
+      font-family: "Inter", -apple-system, sans-serif;
+      font-size: 41px;
+      font-weight: 500;
+      color: var(--white);
+      line-height: 1.4;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .clip-caption .highlight-word {
+      position: relative;
+      color: var(--white);
+      text-shadow: 0 2px 15px rgba(0,0,0,0.9), 0 1px 3px rgba(0,0,0,0.9);
+      padding: 1px 1px;
+      margin: 0 1px;
+      display: inline-block;
+    }
+
+    .clip-caption .highlight-word::before {
+      content: '';
+      position: absolute;
+      inset: -1px -1px;
+      background: #3ba3e0;
+      border-radius: 6px;
+      transform: scale(0);
+      z-index: -1;
+    }
+
+    .clip-caption .highlight-word.highlighted {
+      text-shadow: none;
+    }
+
+    .clip-caption .highlight-word::before {
+      transition: transform 0.2s ease-out;
+    }
+
+    .clip-caption .highlight-word.highlighted::before {
+      animation: box-pop-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes box-pop-in {
+      0% {
+        transform: scale(0);
+      }
+      70% {
+        transform: scale(1.06);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .clip-caption.active {
+      animation: clip-caption-in 0.3s var(--ease-out) forwards;
+    }
+
+    .clip-caption.exit {
+      animation: clip-caption-out 0.25s var(--ease-smooth) forwards;
+    }
+
+    @keyframes clip-caption-in {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes clip-caption-out {
+      to {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+    }
+
+    /* Caption overlay - CENTERED */
+    .caption-layer {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 50px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .caption-layer.active {
+      opacity: 1;
+    }
+
+    .caption {
+      font-family: "Inter", -apple-system, sans-serif;
+      font-size: 51px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.95);
+      line-height: 1.5;
+      letter-spacing: -0.01em;
+      opacity: 0;
+      transform: translateY(20px);
+      filter: blur(6px);
+    }
+
+    .caption.active {
+      animation: caption-in 0.5s var(--ease-out) forwards;
+    }
+
+    .caption.exit {
+      animation: caption-out 0.4s var(--ease-smooth) forwards;
+    }
+
+    @keyframes caption-in {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes caption-out {
+      to {
+        opacity: 0;
+        transform: translateY(-15px);
+        filter: blur(4px);
+      }
+    }
+
+    /* Dark overlay for logo scene */
+    .dark-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      transition: opacity 0.8s var(--ease-smooth);
+    }
+
+    .dark-overlay.active {
+      opacity: 1;
+    }
+
+    /* Logo scene */
+    .logo-scene {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .logo-scene.active {
+      opacity: 1;
+    }
+
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .logo-lockup {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .logo-icon {
+      width: 102px;
+      height: 102px;
+      opacity: 0;
+      transform: translateX(-50px) rotate(-20deg) scale(0.6);
+    }
+
+    .logo-icon img {
+      width: 100%;
+      height: 100%;
+      border-radius: 24px;
+      transform: scale(1.2);
+    }
+
+    .logo-scene.active .logo-icon {
+      animation: icon-swoop 0.7s var(--ease-out) forwards;
+    }
+
+    @keyframes icon-swoop {
+      60% {
+        opacity: 1;
+        transform: translateX(0) rotate(4deg) scale(1.05);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0) rotate(0) scale(1);
+      }
+    }
+
+    .wordmark {
+      font-family: "Poppins", sans-serif;
+      font-size: 75px;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: -0.02em;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .wordmark .letter {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(100%);
+    }
+
+    .logo-scene.active .wordmark .letter {
+      animation: letter-up 0.35s var(--ease-out) forwards;
+    }
+
+    .logo-scene.active .wordmark .letter:nth-child(1) { animation-delay: 0.35s; }
+    .logo-scene.active .wordmark .letter:nth-child(2) { animation-delay: 0.38s; }
+    .logo-scene.active .wordmark .letter:nth-child(3) { animation-delay: 0.41s; }
+    .logo-scene.active .wordmark .letter:nth-child(4) { animation-delay: 0.44s; }
+    .logo-scene.active .wordmark .letter:nth-child(5) { animation-delay: 0.47s; }
+    .logo-scene.active .wordmark .letter:nth-child(6) { animation-delay: 0.50s; }
+    .logo-scene.active .wordmark .letter:nth-child(7) { animation-delay: 0.53s; }
+    .logo-scene.active .wordmark .letter:nth-child(8) { animation-delay: 0.56s; }
+    .logo-scene.active .wordmark .letter:nth-child(9) { animation-delay: 0.59s; }
+
+    @keyframes letter-up {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .tagline {
+      font-family: "Poppins", sans-serif;
+      margin-top: -4px;
+      padding-left: 128px;
+      font-size: 27px;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      color: rgba(255, 255, 255, 0.7);
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .logo-scene.active .tagline {
+      animation: tag-in 0.5s var(--ease-out) 0.9s forwards;
+    }
+
+    @keyframes tag-in {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Controls panel */
+    .controls {
+      width: 350px;
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 20px;
+      color: white;
+      height: fit-content;
+    }
+
+    .controls h2 {
+      font-size: 16px;
+      margin-bottom: 15px;
+      color: #888;
+    }
+
+    .time-display {
+      font-size: 36px;
+      font-weight: 700;
+      font-family: 'SF Mono', monospace;
+      color: var(--brand);
+      margin-bottom: 15px;
+    }
+
+    .phase-display {
+      padding: 10px 15px;
+      background: #222;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .phase-display .label { color: #666; }
+    .phase-display .value { color: #fff; font-weight: 500; }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      background: var(--brand);
+      color: white;
+    }
+
+    button:hover { background: #0a6da8; }
+    button.secondary { background: #333; }
+    button.secondary:hover { background: #444; }
+
+    .timeline {
+      margin-top: 20px;
+    }
+
+    .timeline-bar {
+      height: 8px;
+      background: #333;
+      border-radius: 4px;
+      position: relative;
+      margin-bottom: 10px;
+    }
+
+    .timeline-progress {
+      height: 100%;
+      background: var(--brand);
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+
+    .timeline-markers {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #666;
+    }
+
+    .timeline-markers span {
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .timeline-markers span:hover {
+      background: #333;
+      color: var(--brand);
+    }
+
+    .phase-list {
+      margin-top: 20px;
+      font-size: 12px;
+    }
+
+    .phase-item {
+      padding: 8px 0;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .phase-item.active { color: var(--brand); }
+    .phase-item .time { color: #666; }
+  </style>
+</head>
+<body>
+  <div class="video-frame">
+    <div class="stage">
+      <div id="videoLayer">
+        <video id="video" playsinline muted>
+          <source src="../un-edited-videos/ad-two-life-journey-full-with-audio.mp4" type="video/mp4">
+        </video>
+      </div>
+
+      <div class="blur-overlay" id="blurOverlay"></div>
+      <div class="calm-overlay" id="calmOverlay"></div>
+
+      <div class="life-text" id="lifeText">
+        <h1>
+          <span class="word">Life</span>
+          <span class="word">moves</span>
+          <span class="word">fast.</span>
+        </h1>
+      </div>
+
+      <div class="dark-overlay" id="darkOverlay"></div>
+
+      <div class="clip-caption-layer" id="clipCaptionLayer">
+        <p class="clip-caption" id="clipCaption"></p>
+      </div>
+
+      <div class="caption-layer" id="captionLayer">
+        <p class="caption" id="caption"></p>
+      </div>
+
+      <div class="logo-scene" id="logoScene">
+        <div class="logo-container">
+          <div class="logo-lockup">
+            <div class="logo-icon">
+              <img src="../assets/logo-icon-white.svg" alt="BidMyRoom">
+            </div>
+            <div class="wordmark">
+              <span class="letter">B</span>
+              <span class="letter">i</span>
+              <span class="letter">d</span>
+              <span class="letter">M</span>
+              <span class="letter">y</span>
+              <span class="letter">R</span>
+              <span class="letter">o</span>
+              <span class="letter">o</span>
+              <span class="letter">m</span>
+            </div>
+          </div>
+          <p class="tagline">Let hotels come to you</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <audio id="audio" src="../un-edited-videos/video-2/audio.mp3"></audio>
+
+  <div class="controls">
+    <h2>Ad 2 — Life Journey — Preview</h2>
+
+    <div class="time-display"><span id="timeDisplay">0.00</span>s</div>
+
+    <div class="phase-display">
+      <span class="label">Phase: </span>
+      <span class="value" id="phaseDisplay">Ready</span>
+    </div>
+
+    <div class="btn-row">
+      <button onclick="playPreview()">Play</button>
+      <button onclick="stopPreview()" class="secondary">Stop</button>
+      <button onclick="resetPreview()" class="secondary">Reset</button>
+    </div>
+
+    <div class="timeline">
+      <div class="timeline-bar">
+        <div class="timeline-progress" id="timelineProgress"></div>
+      </div>
+      <div class="timeline-markers">
+        <span onclick="jumpTo(0)">0s</span>
+        <span onclick="jumpTo(5)">5s</span>
+        <span onclick="jumpTo(10)">10s</span>
+        <span onclick="jumpTo(15)">15s</span>
+        <span onclick="jumpTo(19)">19s</span>
+      </div>
+    </div>
+
+    <div class="phase-list">
+      <div class="phase-item" id="phase1">
+        <span>1. Clips + Audio</span>
+        <span class="time">0 - 7s</span>
+      </div>
+      <div class="phase-item" id="phase2">
+        <span>2. "Life moves fast."</span>
+        <span class="time">7 - 10s</span>
+      </div>
+      <div class="phase-item" id="phase3">
+        <span>3. Captions + Audio</span>
+        <span class="time">10 - 17.5s</span>
+      </div>
+      <div class="phase-item" id="phase4">
+        <span>4. Logo (silent)</span>
+        <span class="time">17.5 - 19s</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const video = document.getElementById('video');
+    const audio = document.getElementById('audio');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const phaseDisplay = document.getElementById('phaseDisplay');
+    const timelineProgress = document.getElementById('timelineProgress');
+
+    const blurOverlay = document.getElementById('blurOverlay');
+    const lifeText = document.getElementById('lifeText');
+    const darkOverlay = document.getElementById('darkOverlay');
+    const captionLayer = document.getElementById('captionLayer');
+    const caption = document.getElementById('caption');
+    const logoScene = document.getElementById('logoScene');
+
+    // Clip definitions (trimmed times in the source video)
+    const clips = [
+      { start: 0.00, end: 2.78 },   // Clip 1: 2.78s
+      { start: 7.70, end: 8.49 },   // Clip 2: 0.79s
+      { start: 11.58, end: 12.51 }, // Clip 3: 0.93s
+      { start: 15.31, end: 15.99 }, // Clip 4: 0.68s
+      { start: 20.35, end: 21.14 }, // Clip 5: 0.79s
+      { start: 27.26, end: 28.25 }, // Clip 6: 0.99s
+    ];
+
+    // Calculate clip durations and cumulative times
+    let clipsDuration = 0;
+    clips.forEach(c => {
+      c.duration = c.end - c.start;
+      c.cumStart = clipsDuration;
+      clipsDuration += c.duration;
+    });
+    // clipsDuration ≈ 6.97s
+
+    // Timeline phases
+    const PHASE = {
+      CLIPS_END: clipsDuration,              // ~7s - clips finish
+      AUDIO_PAUSE: clipsDuration + 0.5,      // ~7.5s - audio pauses (0.5s extra to finish sentence)
+      LIFE_TEXT_END: clipsDuration + 3.0,    // ~10s - "Life moves fast" phase ends
+      AUDIO_RESUME: 7.32,                    // Audio timestamp where "and booking..." starts
+      AUDIO_END: 14.46,                      // Audio timestamp where voiceover ends
+      LOGO_DURATION: 1.5,                    // Logo stays on screen (silent)
+      TOTAL: 19                              // Total ad duration
+    };
+
+    // Captions for clips phase (ad timeline, 0-7s)
+    // Words highlight in blue as they're spoken
+    const clipCaptions = [
+      {
+        start: 0.0, end: 2.3,
+        words: [
+          { text: "Life", highlightAt: 0.0 },
+          { text: "is", highlightAt: 0.36 },
+          { text: "made", highlightAt: 0.72 },
+          { text: "of", highlightAt: 0.94 },
+          { text: "moments", highlightAt: 1.12 },
+          { text: "that", highlightAt: 1.40 },
+          { text: "matter", highlightAt: 1.68 }
+        ],
+        separator: " "
+      },
+      { start: 2.5, end: 3.5, text: "childhood", highlight: true },
+      { start: 3.6, end: 4.4, text: "growing up", highlight: true },
+      { start: 4.5, end: 5.4, text: "college", highlight: true },
+      { start: 5.5, end: 6.0, text: "marriage", highlight: true },
+      { start: 6.35, end: 7.2, text: "grandkids", highlight: true },
+    ];
+
+    // Captions synced to audio (audio timestamps) for phase 3
+    const captions = [
+      { audioStart: 7.32, audioEnd: 8.66, text: "and booking a hotel" },
+      { audioStart: 8.66, audioEnd: 10.18, text: "shouldn't take you away from them." },
+      { audioStart: 10.86, audioEnd: 12.30, text: "Post your stay on BidMyRoom" },
+      { audioStart: 12.98, audioEnd: 14.46, text: "and let hotels bid for you." },
+    ];
+
+    let adTime = 0;
+    let isPlaying = false;
+    let animationFrame = null;
+    let lastTimestamp = 0;
+    let currentClipIndex = 0;
+    let triggered = {};
+
+    function jumpTo(time) {
+      stopPreview();
+      adTime = time;
+      currentClipIndex = 0;
+      triggered = {};
+
+      // Reset visuals first
+      blurOverlay.classList.remove('active');
+      document.getElementById('calmOverlay').classList.remove('active');
+      lifeText.classList.remove('active', 'fade-out');
+      lifeText.style.display = '';
+      captionLayer.classList.remove('active');
+      caption.classList.remove('active', 'exit');
+      caption.textContent = '';
+      logoScene.classList.remove('active');
+      document.querySelectorAll('.phase-item').forEach(p => p.classList.remove('active'));
+
+      // Set up state based on jump time
+      if (time < PHASE.CLIPS_END) {
+        // Jumping into clips phase - audio syncs with ad time
+        audio.currentTime = time;
+        audio.play();
+        triggered.audioStart = true;
+      }
+      else if (time < PHASE.LIFE_TEXT_END) {
+        // Jumping into "Life moves fast" phase - audio paused
+        triggered.audioStart = true;
+        triggered.calmIn = true;
+        triggered.audioPause = true;
+        blurOverlay.classList.add('active');
+        document.getElementById('calmOverlay').classList.add('active');
+
+        if (time >= PHASE.AUDIO_PAUSE) {
+          triggered.lifeText = true;
+          lifeText.classList.add('active');
+        }
+      }
+      else {
+        // Jumping into captions phase - audio resumes from correct position
+        triggered.audioStart = true;
+        triggered.calmIn = true;
+        triggered.audioPause = true;
+        triggered.lifeText = true;
+        triggered.lifeTextOut = true;
+        triggered.lifeTextHide = true;
+        triggered.audioResume = true;
+
+        blurOverlay.classList.add('active');
+        document.getElementById('calmOverlay').classList.add('active');
+        lifeText.style.display = 'none';
+        captionLayer.classList.add('active');
+
+        // Calculate correct audio position
+        const audioTime = PHASE.AUDIO_RESUME + (time - PHASE.LIFE_TEXT_END);
+        audio.currentTime = audioTime;
+        audio.play();
+      }
+
+      updateDisplay();
+      playPreview();
+    }
+
+    function resetPreview() {
+      stopPreview();
+      adTime = 0;
+      currentClipIndex = 0;
+      triggered = {};
+
+      video.currentTime = clips[0].start;
+      audio.currentTime = 0;
+
+      // Reset all visual states
+      blurOverlay.classList.remove('active');
+      const calmOverlay = document.getElementById('calmOverlay');
+      if (calmOverlay) calmOverlay.classList.remove('active');
+      lifeText.classList.remove('active', 'fade-out');
+      lifeText.style.display = '';
+      darkOverlay.classList.remove('active');
+
+      // Reset clip captions
+      const clipCaptionLayer = document.getElementById('clipCaptionLayer');
+      const clipCaption = document.getElementById('clipCaption');
+      if (clipCaptionLayer) clipCaptionLayer.classList.remove('active');
+      if (clipCaption) {
+        clipCaption.classList.remove('active', 'exit');
+        clipCaption.innerHTML = '';
+        clipCaption.dataset.capId = '';
+      }
+
+      captionLayer.classList.remove('active');
+      caption.classList.remove('active', 'exit');
+      caption.textContent = '';
+      logoScene.classList.remove('active');
+
+      // Reset phase highlights
+      document.querySelectorAll('.phase-item').forEach(p => p.classList.remove('active'));
+
+      updateDisplay();
+    }
+
+    function stopPreview() {
+      isPlaying = false;
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+        animationFrame = null;
+      }
+      video.pause();
+      audio.pause();
+    }
+
+    function playPreview() {
+      if (isPlaying) return;
+      isPlaying = true;
+      lastTimestamp = performance.now();
+      tick();
+    }
+
+    function tick() {
+      if (!isPlaying) return;
+
+      const now = performance.now();
+      const delta = (now - lastTimestamp) / 1000;
+      lastTimestamp = now;
+
+      adTime += delta;
+
+      updatePhase();
+      updateDisplay();
+
+      if (adTime < PHASE.TOTAL) {
+        animationFrame = requestAnimationFrame(tick);
+      } else {
+        stopPreview();
+      }
+    }
+
+    function updatePhase() {
+      const calmOverlay = document.getElementById('calmOverlay');
+
+      // PHASE 1: Play clips with audio (0 to ~7s)
+      if (adTime < PHASE.CLIPS_END) {
+        document.getElementById('phase1').classList.add('active');
+        phaseDisplay.textContent = `Clip ${currentClipIndex + 1} of 6`;
+
+        // Start audio at beginning
+        if (!triggered.audioStart) {
+          triggered.audioStart = true;
+          audio.currentTime = 0;
+          audio.play();
+          document.getElementById('clipCaptionLayer').classList.add('active');
+        }
+
+        // Update clip captions
+        updateClipCaptions(adTime);
+
+        // Find which clip we should be showing
+        let cumTime = 0;
+        for (let i = 0; i < clips.length; i++) {
+          if (adTime < cumTime + clips[i].duration) {
+            if (currentClipIndex !== i) {
+              currentClipIndex = i;
+              video.currentTime = clips[i].start;
+            }
+            const clipProgress = adTime - cumTime;
+            const targetTime = clips[i].start + clipProgress;
+            if (Math.abs(video.currentTime - targetTime) > 0.1) {
+              video.currentTime = targetTime;
+            }
+            if (video.paused) video.play();
+            break;
+          }
+          cumTime += clips[i].duration;
+        }
+      }
+
+      // PHASE 2: "Life moves fast." (~7s to ~10s)
+      else if (adTime < PHASE.LIFE_TEXT_END) {
+        document.getElementById('phase1').classList.remove('active');
+        document.getElementById('phase2').classList.add('active');
+        phaseDisplay.textContent = '"Life moves fast."';
+
+        video.pause();
+
+        // Hide clip captions
+        if (!triggered.clipCaptionsHide) {
+          triggered.clipCaptionsHide = true;
+          document.getElementById('clipCaptionLayer').classList.remove('active');
+        }
+
+        // Start calm background
+        if (!triggered.calmIn) {
+          triggered.calmIn = true;
+          blurOverlay.classList.add('active');
+          calmOverlay.classList.add('active');
+        }
+
+        // Audio continues for 0.5s, then pause
+        if (adTime >= PHASE.AUDIO_PAUSE && !triggered.audioPause) {
+          triggered.audioPause = true;
+          audio.pause();
+        }
+
+        // Show "Life moves fast." after audio pauses
+        if (adTime >= PHASE.AUDIO_PAUSE && !triggered.lifeText) {
+          triggered.lifeText = true;
+          lifeText.classList.add('active');
+        }
+
+        // Fade out text near end
+        if (adTime > PHASE.LIFE_TEXT_END - 0.5 && !triggered.lifeTextOut) {
+          triggered.lifeTextOut = true;
+          lifeText.classList.add('fade-out');
+        }
+      }
+
+      // PHASE 3: Audio resumes + Captions (~10s onwards)
+      else {
+        document.getElementById('phase2').classList.remove('active');
+        document.getElementById('phase3').classList.add('active');
+
+        if (!triggered.lifeTextHide) {
+          triggered.lifeTextHide = true;
+          lifeText.style.display = 'none';
+        }
+
+        // Resume audio from "and booking a hotel..."
+        if (!triggered.audioResume) {
+          triggered.audioResume = true;
+          audio.currentTime = PHASE.AUDIO_RESUME;
+          audio.play();
+          captionLayer.classList.add('active');
+        }
+
+        phaseDisplay.textContent = 'Audio + Captions';
+
+        const audioTime = PHASE.AUDIO_RESUME + (adTime - PHASE.LIFE_TEXT_END);
+        updateCaptions(audioTime);
+
+        // PHASE 4: Logo (after audio ends, stays 1.5s silent)
+        if (audioTime >= PHASE.AUDIO_END) {
+          document.getElementById('phase3').classList.remove('active');
+          document.getElementById('phase4').classList.add('active');
+          phaseDisplay.textContent = 'Logo (silent)';
+
+          if (!triggered.logo) {
+            triggered.logo = true;
+            audio.pause();
+            captionLayer.classList.remove('active');
+            logoScene.classList.add('active');
+          }
+        }
+      }
+    }
+
+    function updateClipCaptions(adTime) {
+      const clipCaption = document.getElementById('clipCaption');
+      let found = false;
+      let currentCapId = clipCaption.dataset.capId;
+
+      for (let i = 0; i < clipCaptions.length; i++) {
+        const cap = clipCaptions[i];
+        if (adTime >= cap.start && adTime < cap.end) {
+          found = true;
+
+          // Check if we need to change caption
+          if (currentCapId !== String(i)) {
+            clipCaption.classList.remove('active', 'exit');
+            void clipCaption.offsetWidth;
+            clipCaption.dataset.capId = String(i);
+
+            // Build HTML based on caption type
+            if (cap.words) {
+              // Multiple words with individual highlighting
+              const sep = cap.separator !== undefined ? cap.separator : ', ';
+              const html = cap.words.map((w, idx) => {
+                const separator = idx < cap.words.length - 1 ? sep : '';
+                return `<span class="highlight-word" data-highlight="${w.highlightAt}">${w.text}</span>${separator}`;
+              }).join('');
+              clipCaption.innerHTML = html;
+            } else if (cap.highlight) {
+              // Single word, always highlighted
+              clipCaption.innerHTML = `<span class="highlight-word highlighted">${cap.text}</span>`;
+            } else {
+              // Plain text
+              clipCaption.innerHTML = cap.text;
+            }
+
+            clipCaption.classList.add('active');
+          }
+
+          // Update word highlights - only one at a time
+          const highlightWords = clipCaption.querySelectorAll('.highlight-word[data-highlight]');
+          let activeWord = null;
+
+          // Find which word should be highlighted (the latest one that's started)
+          highlightWords.forEach(word => {
+            const highlightAt = parseFloat(word.dataset.highlight);
+            if (adTime >= highlightAt) {
+              activeWord = word;
+            }
+          });
+
+          // Remove highlight from all, add to active one only
+          highlightWords.forEach(word => {
+            if (word === activeWord) {
+              word.classList.add('highlighted');
+            } else {
+              word.classList.remove('highlighted');
+            }
+          });
+
+          break;
+        }
+      }
+
+      if (!found && clipCaption.innerHTML && !clipCaption.classList.contains('exit')) {
+        clipCaption.classList.add('exit');
+        clipCaption.dataset.capId = '';
+      }
+    }
+
+    function updateCaptions(audioTime) {
+      let found = false;
+      for (const cap of captions) {
+        if (audioTime >= cap.audioStart && audioTime < cap.audioEnd) {
+          if (caption.textContent !== cap.text) {
+            caption.classList.remove('active', 'exit');
+            void caption.offsetWidth; // Trigger reflow
+            caption.textContent = cap.text;
+            caption.classList.add('active');
+          }
+          found = true;
+          break;
+        }
+      }
+
+      if (!found && caption.textContent && !caption.classList.contains('exit')) {
+        caption.classList.add('exit');
+      }
+    }
+
+    function updateDisplay() {
+      timeDisplay.textContent = adTime.toFixed(2);
+      const progress = Math.min((adTime / PHASE.TOTAL) * 100, 100);
+      timelineProgress.style.width = progress + '%';
+    }
+
+    // Initialize
+    video.addEventListener('loadedmetadata', () => {
+      resetPreview();
+    });
+  </script>
+</body>
+</html>

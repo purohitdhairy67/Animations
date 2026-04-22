@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BidMyRoom Ad — Overlay Template (Transparent)</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap");
+
+      :root {
+        --brand: #0f81c0;
+        --white: #ffffff;
+        --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+        --ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+        --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html, body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        font-family: "Poppins", sans-serif;
+        background: transparent; /* IMPORTANT: Transparent for export */
+      }
+
+      .stage {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: transparent; /* IMPORTANT: Transparent for export */
+      }
+
+      /* ============ OVERLAYS ============ */
+      .vignette {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%);
+        opacity: 0;
+        transition: opacity 1s var(--ease-smooth);
+      }
+      .vignette.active { opacity: 1; }
+
+      .bottom-gradient {
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        height: 60%;
+        background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
+        opacity: 0;
+        transition: opacity 0.8s var(--ease-smooth);
+      }
+      .bottom-gradient.active { opacity: 1; }
+
+      /* ============ SCENE SYSTEM ============ */
+      .scene {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* ============ ADD YOUR SCENES HERE ============ */
+      /* Copy styles from preview HTML */
+
+      #scene-1 { justify-content: flex-end; padding-bottom: 280px; }
+
+      .headline {
+        font-size: 72px;
+        font-weight: 800;
+        line-height: 1.15;
+        color: var(--white);
+        text-align: center;
+        padding: 0 80px;
+        text-shadow: 0 4px 20px rgba(0,0,0,0.8);
+      }
+
+      .headline .word {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(60px);
+        filter: blur(10px);
+      }
+
+      #scene-1.active .headline .word {
+        animation: word-in 0.6s var(--ease-out) forwards;
+      }
+      #scene-1.active .headline .word:nth-child(1) { animation-delay: 0.0s; }
+      #scene-1.active .headline .word:nth-child(2) { animation-delay: 0.1s; }
+      #scene-1.active .headline .word:nth-child(3) { animation-delay: 0.2s; }
+
+      @keyframes word-in {
+        to { opacity: 1; transform: translateY(0); filter: blur(0); }
+      }
+
+      #scene-1.exit .headline .word {
+        animation: word-out 0.3s var(--ease-smooth) forwards;
+      }
+      @keyframes word-out {
+        to { opacity: 0; transform: translateY(-30px); filter: blur(8px); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <!-- NO VIDEO HERE - This is for transparent export -->
+
+      <div class="vignette" id="vignette"></div>
+      <div class="bottom-gradient" id="gradient"></div>
+
+      <!-- UPDATE: Add your scenes here (same as preview) -->
+      <div class="scene" id="scene-1">
+        <h1 class="headline">
+          <span class="word">Your</span>&nbsp;
+          <span class="word">Text</span>&nbsp;
+          <span class="word">Here</span>
+        </h1>
+      </div>
+    </div>
+
+    <script>
+      const vignette = document.getElementById("vignette");
+      const gradient = document.getElementById("gradient");
+      const scene1 = document.getElementById("scene-1");
+
+      // ============ UPDATE: Timing config (must match preview) ============
+      const T = {
+        effectsIn: 10.0,
+        scene1In: 10.5,
+        scene1Out: 13.0,
+        // Add more scenes...
+      };
+
+      let triggered = {};
+
+      function showScene(scene) {
+        scene.style.opacity = "1";
+        scene.classList.add("active");
+      }
+
+      function exitScene(scene) {
+        scene.classList.add("exit");
+        setTimeout(() => { scene.style.opacity = "0"; }, 400);
+      }
+
+      // ============ PUPPETEER CONTROL ============
+      // Called by ExportFrames.js to set current time
+      window.setTime = function(t) {
+        if (t >= T.effectsIn && !triggered.effectsIn) {
+          triggered.effectsIn = true;
+          vignette.classList.add("active");
+          gradient.classList.add("active");
+        }
+
+        if (t >= T.scene1In && !triggered.s1in) {
+          triggered.s1in = true;
+          showScene(scene1);
+        }
+        if (t >= T.scene1Out && !triggered.s1out) {
+          triggered.s1out = true;
+          exitScene(scene1);
+        }
+
+        // Add more scene triggers (same as preview)...
+      };
+    </script>
+  </body>
+</html>

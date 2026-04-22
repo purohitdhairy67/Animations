@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ad 2 - Life Journey - Clip Trimmer</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0d0d0d;
+      color: white;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    /* Main preview */
+    .preview-section {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .video-preview {
+      flex: 1;
+      max-width: 400px;
+    }
+
+    .video-preview video {
+      width: 100%;
+      border-radius: 8px;
+      background: #000;
+    }
+
+    .preview-controls {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .preview-controls button {
+      background: #0f81c0;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .preview-controls button:hover { background: #0a6da8; }
+    .preview-controls button.secondary { background: #333; }
+    .preview-controls button.secondary:hover { background: #444; }
+
+    /* Stats panel */
+    .stats-panel {
+      flex: 1;
+      background: #1a1a1a;
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #333;
+    }
+
+    .stat-row:last-child { border-bottom: none; }
+
+    .stat-label { color: #888; }
+    .stat-value {
+      font-weight: 600;
+      font-family: 'SF Mono', monospace;
+    }
+    .stat-value.good { color: #4ade80; }
+    .stat-value.warn { color: #fbbf24; }
+    .stat-value.bad { color: #f87171; }
+
+    .duration-bar {
+      margin-top: 15px;
+      height: 24px;
+      background: #333;
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .duration-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #0f81c0, #4ade80);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    .duration-target {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #fff;
+    }
+
+    /* Clip trimmer grid */
+    .clips-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .clip-card {
+      background: #1a1a1a;
+      border-radius: 8px;
+      padding: 15px;
+      border: 2px solid transparent;
+    }
+
+    .clip-card.active {
+      border-color: #0f81c0;
+    }
+
+    .clip-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .clip-title {
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .clip-duration {
+      font-family: 'SF Mono', monospace;
+      font-size: 14px;
+      color: #0f81c0;
+    }
+
+    /* Thumbnail strip */
+    .thumb-strip {
+      position: relative;
+      height: 60px;
+      background: #000;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .thumb-images {
+      display: flex;
+      height: 100%;
+    }
+
+    .thumb-images img {
+      height: 100%;
+      width: auto;
+      flex-shrink: 0;
+    }
+
+    /* Trim handles */
+    .trim-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .trim-left, .trim-right {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+    }
+
+    .trim-left { left: 0; }
+    .trim-right { right: 0; }
+
+    .handle {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 12px;
+      background: #0f81c0;
+      cursor: ew-resize;
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .handle::after {
+      content: '';
+      width: 2px;
+      height: 20px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 1px;
+    }
+
+    .handle-left { left: 0; transform: translateX(-50%); border-radius: 4px 0 0 4px; }
+    .handle-right { right: 0; transform: translateX(50%); border-radius: 0 4px 4px 0; }
+
+    .selected-region {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      border: 2px solid #0f81c0;
+      border-left: none;
+      border-right: none;
+      pointer-events: none;
+    }
+
+    /* Time labels */
+    .time-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #666;
+      margin-top: 5px;
+    }
+
+    .trim-times {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-top: 8px;
+      padding: 8px;
+      background: #222;
+      border-radius: 4px;
+    }
+
+    .trim-times span {
+      font-family: 'SF Mono', monospace;
+    }
+
+    .trim-times .in-time { color: #4ade80; }
+    .trim-times .out-time { color: #f87171; }
+
+    /* Play clip button */
+    .play-clip-btn {
+      width: 100%;
+      margin-top: 10px;
+      padding: 8px;
+      background: #333;
+      border: none;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .play-clip-btn:hover { background: #444; }
+
+    /* Export section */
+    .export-section {
+      margin-top: 30px;
+      padding: 20px;
+      background: #1a1a1a;
+      border-radius: 8px;
+    }
+
+    .export-section h2 {
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    .export-code {
+      background: #0d0d0d;
+      padding: 15px;
+      border-radius: 6px;
+      font-family: 'SF Mono', monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #888;
+      overflow-x: auto;
+    }
+
+    .export-code .clip-line {
+      color: #4ade80;
+    }
+
+    .copy-btn {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background: #0f81c0;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .copy-btn:hover { background: #0a6da8; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Ad 2 — Life Journey — Clip Trimmer</h1>
+    <p class="subtitle">Drag the blue handles to trim each clip. Target: 15.18s total for audio sync.</p>
+
+    <div class="preview-section">
+      <div class="video-preview">
+        <video id="video" playsinline muted>
+          <source src="../un-edited-videos/ad-two-life-journey-full-with-audio.mp4" type="video/mp4">
+        </video>
+        <audio id="audio" src="../un-edited-videos/video-2/audio.mp3"></audio>
+        <div class="preview-controls">
+          <button onclick="playTrimmedPreview()">Preview with Audio</button>
+          <button class="secondary" onclick="stopPreview()">Stop</button>
+        </div>
+        <p style="text-align: center; margin-top: 10px; font-size: 12px; color: #666;">
+          Audio plays from 0:00 while trimmed clips play in sequence
+        </p>
+      </div>
+
+      <div class="stats-panel">
+        <div class="stat-row">
+          <span class="stat-label">Audio Duration</span>
+          <span class="stat-value">15.18s</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Trimmed Video</span>
+          <span class="stat-value" id="totalDuration">15.00s</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Difference</span>
+          <span class="stat-value" id="diffValue">-0.18s</span>
+        </div>
+        <div class="duration-bar">
+          <div class="duration-fill" id="durationFill" style="width: 98.8%"></div>
+          <div class="duration-target" style="left: 100%"></div>
+        </div>
+        <p style="margin-top: 10px; font-size: 12px; color: #666;">
+          Green = perfect match | Yellow = close | Red = needs adjustment
+        </p>
+      </div>
+    </div>
+
+    <div class="clips-grid" id="clipsGrid">
+      <!-- Clips will be rendered here -->
+    </div>
+
+    <div class="export-section">
+      <h2>Trim Instructions (copy and send to me)</h2>
+      <div class="export-code" id="exportCode">
+        Adjust the clips above, then click "Copy Trim Data"
+      </div>
+      <button class="copy-btn" onclick="copyToClipboard()">Copy to Clipboard</button>
+    </div>
+  </div>
+
+  <script>
+    const video = document.getElementById('video');
+    const AUDIO_DURATION = 15.18;
+
+    // Clip data: [startInFullVideo, endInFullVideo, trimIn, trimOut]
+    // trimIn/trimOut are relative to clip start (0 to clipDuration)
+    const clips = [
+      { id: 1, start: 0,     end: 5.04,  inPoint: 0.5,  outPoint: 3.0,  label: "Toddlers playing" },
+      { id: 2, start: 5.04,  end: 10.08, inPoint: 1.0,  outPoint: 3.5,  label: "Kids ~8-10yo" },
+      { id: 3, start: 10.08, end: 15.13, inPoint: 1.5,  outPoint: 4.0,  label: "Family walking" },
+      { id: 4, start: 15.13, end: 20.17, inPoint: 0.5,  outPoint: 3.0,  label: "Teenagers" },
+      { id: 5, start: 20.17, end: 25.21, inPoint: 1.0,  outPoint: 3.5,  label: "Wedding" },
+      { id: 6, start: 25.21, end: 30.25, inPoint: 1.0,  outPoint: 3.5,  label: "Next generation" },
+    ];
+
+    function getClipDuration(clip) {
+      return clip.outPoint - clip.inPoint;
+    }
+
+    function getTotalDuration() {
+      return clips.reduce((sum, clip) => sum + getClipDuration(clip), 0);
+    }
+
+    function updateStats() {
+      const total = getTotalDuration();
+      const diff = total - AUDIO_DURATION;
+
+      document.getElementById('totalDuration').textContent = total.toFixed(2) + 's';
+
+      const diffEl = document.getElementById('diffValue');
+      diffEl.textContent = (diff >= 0 ? '+' : '') + diff.toFixed(2) + 's';
+
+      // Color coding
+      const absD = Math.abs(diff);
+      if (absD < 0.2) {
+        diffEl.className = 'stat-value good';
+      } else if (absD < 0.5) {
+        diffEl.className = 'stat-value warn';
+      } else {
+        diffEl.className = 'stat-value bad';
+      }
+
+      // Duration bar
+      const percent = Math.min((total / AUDIO_DURATION) * 100, 110);
+      document.getElementById('durationFill').style.width = percent + '%';
+      document.getElementById('durationFill').style.background =
+        absD < 0.2 ? 'linear-gradient(90deg, #4ade80, #22c55e)' :
+        absD < 0.5 ? 'linear-gradient(90deg, #fbbf24, #f59e0b)' :
+        'linear-gradient(90deg, #f87171, #ef4444)';
+
+      // Update export code
+      updateExportCode();
+    }
+
+    function updateExportCode() {
+      const lines = clips.map(clip => {
+        const absIn = (clip.start + clip.inPoint).toFixed(2);
+        const absOut = (clip.start + clip.outPoint).toFixed(2);
+        return `Clip ${clip.id}: ${absIn}s - ${absOut}s (${getClipDuration(clip).toFixed(2)}s)`;
+      });
+
+      const total = getTotalDuration();
+      lines.push('');
+      lines.push(`Total: ${total.toFixed(2)}s / Audio: ${AUDIO_DURATION}s`);
+
+      document.getElementById('exportCode').innerHTML =
+        lines.map(l => l ? `<span class="clip-line">${l}</span>` : '').join('<br>');
+    }
+
+    function renderClips() {
+      const grid = document.getElementById('clipsGrid');
+      grid.innerHTML = '';
+
+      clips.forEach((clip, index) => {
+        const clipDuration = clip.end - clip.start;
+        const card = document.createElement('div');
+        card.className = 'clip-card';
+        card.id = `clip-${clip.id}`;
+
+        card.innerHTML = `
+          <div class="clip-header">
+            <span class="clip-title">Clip ${clip.id} — ${clip.label}</span>
+            <span class="clip-duration" id="dur-${clip.id}">${getClipDuration(clip).toFixed(2)}s</span>
+          </div>
+          <div class="thumb-strip" id="strip-${clip.id}">
+            <div class="thumb-images" id="thumbs-${clip.id}"></div>
+            <div class="trim-overlay">
+              <div class="trim-left" id="trimL-${clip.id}"></div>
+              <div class="trim-right" id="trimR-${clip.id}"></div>
+              <div class="selected-region" id="region-${clip.id}"></div>
+              <div class="handle handle-left" id="handleL-${clip.id}"></div>
+              <div class="handle handle-right" id="handleR-${clip.id}"></div>
+            </div>
+          </div>
+          <div class="time-labels">
+            <span>0s</span>
+            <span>${(clipDuration/2).toFixed(1)}s</span>
+            <span>${clipDuration.toFixed(1)}s</span>
+          </div>
+          <div class="trim-times">
+            <span>In: <span class="in-time" id="inTime-${clip.id}">${clip.inPoint.toFixed(2)}s</span></span>
+            <span>Out: <span class="out-time" id="outTime-${clip.id}">${clip.outPoint.toFixed(2)}s</span></span>
+          </div>
+          <button class="play-clip-btn" onclick="playClip(${index})">Play Trimmed Section</button>
+        `;
+
+        grid.appendChild(card);
+
+        // Load thumbnail images
+        loadThumbnails(clip);
+
+        // Set up trim handles
+        setupTrimHandles(clip);
+      });
+
+      updateStats();
+    }
+
+    function loadThumbnails(clip) {
+      const container = document.getElementById(`thumbs-${clip.id}`);
+      // Use extracted frames from the frames folder
+      for (let i = 1; i <= 5; i++) {
+        const img = document.createElement('img');
+        img.src = `../un-edited-videos/video-2/frames/clip${clip.id}_0${i}.jpg`;
+        img.alt = `Frame ${i}`;
+        img.onerror = () => { img.style.display = 'none'; };
+        container.appendChild(img);
+      }
+    }
+
+    function setupTrimHandles(clip) {
+      const clipDuration = clip.end - clip.start;
+      const strip = document.getElementById(`strip-${clip.id}`);
+      const handleL = document.getElementById(`handleL-${clip.id}`);
+      const handleR = document.getElementById(`handleR-${clip.id}`);
+
+      function updateVisuals() {
+        const inPercent = (clip.inPoint / clipDuration) * 100;
+        const outPercent = (clip.outPoint / clipDuration) * 100;
+
+        document.getElementById(`trimL-${clip.id}`).style.width = inPercent + '%';
+        document.getElementById(`trimR-${clip.id}`).style.width = (100 - outPercent) + '%';
+
+        const region = document.getElementById(`region-${clip.id}`);
+        region.style.left = inPercent + '%';
+        region.style.width = (outPercent - inPercent) + '%';
+
+        handleL.style.left = inPercent + '%';
+        handleR.style.right = (100 - outPercent) + '%';
+
+        document.getElementById(`inTime-${clip.id}`).textContent = clip.inPoint.toFixed(2) + 's';
+        document.getElementById(`outTime-${clip.id}`).textContent = clip.outPoint.toFixed(2) + 's';
+        document.getElementById(`dur-${clip.id}`).textContent = getClipDuration(clip).toFixed(2) + 's';
+
+        updateStats();
+      }
+
+      function handleDrag(e, isLeft) {
+        e.preventDefault();
+        const rect = strip.getBoundingClientRect();
+
+        function onMove(e) {
+          const x = (e.clientX || e.touches[0].clientX) - rect.left;
+          const percent = Math.max(0, Math.min(100, (x / rect.width) * 100));
+          const time = (percent / 100) * clipDuration;
+
+          if (isLeft) {
+            clip.inPoint = Math.min(time, clip.outPoint - 0.5);
+            clip.inPoint = Math.max(0, clip.inPoint);
+          } else {
+            clip.outPoint = Math.max(time, clip.inPoint + 0.5);
+            clip.outPoint = Math.min(clipDuration, clip.outPoint);
+          }
+
+          updateVisuals();
+        }
+
+        function onUp() {
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup', onUp);
+          document.removeEventListener('touchmove', onMove);
+          document.removeEventListener('touchend', onUp);
+        }
+
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+        document.addEventListener('touchmove', onMove);
+        document.addEventListener('touchend', onUp);
+      }
+
+      handleL.addEventListener('mousedown', (e) => handleDrag(e, true));
+      handleL.addEventListener('touchstart', (e) => handleDrag(e, true));
+      handleR.addEventListener('mousedown', (e) => handleDrag(e, false));
+      handleR.addEventListener('touchstart', (e) => handleDrag(e, false));
+
+      updateVisuals();
+    }
+
+    function playClip(index) {
+      stopPreview(); // Stop any running preview
+
+      const clip = clips[index];
+      const startTime = clip.start + clip.inPoint;
+      const endTime = clip.start + clip.outPoint;
+
+      // Highlight active clip
+      document.querySelectorAll('.clip-card').forEach(c => c.classList.remove('active'));
+      document.getElementById(`clip-${clip.id}`).classList.add('active');
+
+      video.currentTime = startTime;
+      video.muted = true; // No audio for single clip preview
+      video.play();
+
+      previewInterval = setInterval(() => {
+        if (video.currentTime >= endTime) {
+          video.pause();
+          clearInterval(previewInterval);
+          previewInterval = null;
+        }
+      }, 30);
+    }
+
+    let previewInterval = null;
+    const audio = document.getElementById('audio');
+
+    function stopPreview() {
+      if (previewInterval) {
+        clearInterval(previewInterval);
+        previewInterval = null;
+      }
+      video.pause();
+      audio.pause();
+      audio.currentTime = 0;
+      document.querySelectorAll('.clip-card').forEach(c => c.classList.remove('active'));
+    }
+
+    function playTrimmedPreview() {
+      stopPreview();
+
+      let clipIndex = 0;
+
+      function playNextClip() {
+        if (clipIndex >= clips.length) {
+          clearInterval(previewInterval);
+          previewInterval = null;
+          video.pause();
+          audio.pause();
+          return;
+        }
+
+        const clip = clips[clipIndex];
+        const startTime = clip.start + clip.inPoint;
+        const endTime = clip.start + clip.outPoint;
+
+        // Highlight active clip
+        document.querySelectorAll('.clip-card').forEach(c => c.classList.remove('active'));
+        document.getElementById(`clip-${clip.id}`).classList.add('active');
+
+        // Jump video to clip position (muted - we use separate audio)
+        video.currentTime = startTime;
+        video.muted = true;
+        video.play();
+
+        previewInterval = setInterval(() => {
+          if (video.currentTime >= endTime) {
+            clearInterval(previewInterval);
+            clipIndex++;
+            playNextClip();
+          }
+        }, 30);
+      }
+
+      // Start audio from beginning - plays continuously
+      audio.currentTime = 0;
+      audio.play();
+
+      // Start playing clips in sequence
+      playNextClip();
+    }
+
+    function exportTrims() {
+      updateExportCode();
+      copyToClipboard();
+    }
+
+    function copyToClipboard() {
+      const lines = clips.map(clip => {
+        const absIn = (clip.start + clip.inPoint).toFixed(2);
+        const absOut = (clip.start + clip.outPoint).toFixed(2);
+        return `Clip ${clip.id}: ${absIn}s - ${absOut}s`;
+      });
+
+      const total = getTotalDuration();
+      lines.push(`Total: ${total.toFixed(2)}s`);
+
+      navigator.clipboard.writeText(lines.join('\n')).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy to Clipboard'; }, 2000);
+      });
+    }
+
+    // Initialize
+    renderClips();
+  </script>
+</body>
+</html>

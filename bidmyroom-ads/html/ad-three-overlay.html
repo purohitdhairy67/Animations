@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap");
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    .stage {
+      position: relative;
+      width: 1080px;
+      height: 1920px;
+      background: transparent;
+    }
+
+    /* Room? text - blue on cream background */
+    .room-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .room-q {
+      font-family: "Poppins", sans-serif;
+      font-size: 160px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #0f81c0;
+      display: inline-flex;
+      align-items: baseline;
+    }
+
+    .room-q .rl {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(-110%) scale(1.1);
+    }
+
+    .room-q .qmark {
+      display: inline-block;
+      opacity: 0;
+      transform: scale(0.3) rotate(-20deg);
+      margin-left: 0.05em;
+    }
+
+    /* Logo scene */
+    .logo-scene {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .lockup {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .logo-icon {
+      width: 150px;
+      height: 150px;
+      opacity: 0;
+      transform: translateX(-200px) rotate(-25deg) scale(0.6);
+    }
+
+    .logo-icon img {
+      width: 100%;
+      height: 100%;
+      border-radius: 22%;
+    }
+
+    .wordmark {
+      font-family: "Poppins", sans-serif;
+      font-size: 110px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #0f81c0;
+      display: flex;
+    }
+
+    .wordmark .letter {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(100%);
+    }
+
+    .tag-small {
+      font-family: "Poppins", sans-serif;
+      font-size: 28px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      color: rgba(15, 129, 192, 0.65);
+      opacity: 0;
+      transform: translateY(16px);
+      margin-top: -4px;
+      padding-left: 180px;
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="room-text" id="roomText">
+      <h1 class="room-q">
+        <span class="rl" id="r1">R</span>
+        <span class="rl" id="r2">o</span>
+        <span class="rl" id="r3">o</span>
+        <span class="rl" id="r4">m</span>
+        <span class="qmark" id="qmark">?</span>
+      </h1>
+    </div>
+
+    <div class="logo-scene" id="logoScene">
+      <div class="logo-container">
+        <div class="lockup">
+          <div class="logo-icon" id="logoIcon">
+            <img src="../assets/logo-icon.svg" alt="BidMyRoom">
+          </div>
+          <div class="wordmark" id="wordmark">
+            <span class="letter">B</span>
+            <span class="letter">i</span>
+            <span class="letter">d</span>
+            <span class="letter">M</span>
+            <span class="letter">y</span>
+            <span class="letter">R</span>
+            <span class="letter">o</span>
+            <span class="letter">o</span>
+            <span class="letter">m</span>
+          </div>
+        </div>
+        <p class="tag-small" id="tagSmall">Let hotels come to you</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const r1 = document.getElementById('r1');
+    const r2 = document.getElementById('r2');
+    const r3 = document.getElementById('r3');
+    const r4 = document.getElementById('r4');
+    const qmark = document.getElementById('qmark');
+    const roomText = document.getElementById('roomText');
+    const logoIcon = document.getElementById('logoIcon');
+    const wordmark = document.getElementById('wordmark');
+    const tagSmall = document.getElementById('tagSmall');
+    const logoScene = document.getElementById('logoScene');
+    const letters = wordmark.querySelectorAll('.letter');
+
+    const VIDEO_END = 14.8;
+    const LOGO_START = 16.3;
+
+    function easeBack(t) {
+      const c1 = 1.70158;
+      const c3 = c1 + 1;
+      return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+    }
+
+    function easeOut(t) {
+      return 1 - Math.pow(1 - t, 3);
+    }
+
+    window.setTime = function(t) {
+      // ========== PHASE: VIDEO (before 14.8s) ==========
+      if (t < VIDEO_END) {
+        roomText.style.opacity = 0;
+        logoScene.style.opacity = 0;
+        return;
+      }
+
+      // ========== PHASE: ROOM? (14.8s to 16.3s) ==========
+      if (t >= VIDEO_END && t < LOGO_START) {
+        roomText.style.opacity = 1;
+        logoScene.style.opacity = 0;
+
+        const rt = t - VIDEO_END;
+
+        // Letter drops (R-o-o-m)
+        const letterEls = [r1, r2, r3, r4];
+        letterEls.forEach((el, i) => {
+          const delay = 0.05 + i * 0.1;
+          const duration = 0.6;
+          if (rt >= delay) {
+            const progress = Math.min(1, (rt - delay) / duration);
+            const p = easeBack(progress);
+            el.style.opacity = p;
+            el.style.transform = 'translateY(' + (-110 * (1 - p)) + '%) scale(' + (1.1 - 0.1 * p) + ')';
+          } else {
+            el.style.opacity = 0;
+            el.style.transform = 'translateY(-110%) scale(1.1)';
+          }
+        });
+
+        // ? punch
+        const qDelay = 0.4;
+        const qDuration = 0.5;
+        if (rt >= qDelay) {
+          const progress = Math.min(1, (rt - qDelay) / qDuration);
+          const p = easeBack(progress);
+          qmark.style.opacity = p;
+          qmark.style.transform = 'scale(' + (0.3 + 0.7 * p) + ') rotate(' + (-20 * (1 - p)) + 'deg)';
+        } else {
+          qmark.style.opacity = 0;
+          qmark.style.transform = 'scale(0.3) rotate(-20deg)';
+        }
+
+        // Fade out near end (last 0.2s before logo)
+        if (rt > 1.3) {
+          const fadeProgress = Math.min(1, (rt - 1.3) / 0.2);
+          roomText.style.opacity = 1 - fadeProgress;
+        }
+
+        return;
+      }
+
+      // ========== PHASE: LOGO (16.3s onwards) ==========
+      if (t >= LOGO_START) {
+        roomText.style.opacity = 0;
+        logoScene.style.opacity = 1;
+
+        const lt = t - LOGO_START;
+
+        // Icon swoop
+        if (lt < 0.75) {
+          const p = easeOut(lt / 0.75);
+          logoIcon.style.opacity = p;
+          const rotate = lt < 0.5 ? -25 + 29 * (lt / 0.5) : 4 - 4 * ((lt - 0.5) / 0.25);
+          const scale = lt < 0.5 ? 0.6 + 0.48 * (lt / 0.5) : 1.08 - 0.08 * ((lt - 0.5) / 0.25);
+          logoIcon.style.transform = 'translateX(' + (-200 * (1 - p)) + 'px) rotate(' + rotate + 'deg) scale(' + scale + ')';
+        } else {
+          logoIcon.style.opacity = 1;
+          logoIcon.style.transform = 'translateX(0) rotate(0) scale(1)';
+        }
+
+        // Letters
+        letters.forEach((letter, i) => {
+          const delay = 0.4 + i * 0.05;
+          const duration = 0.35;
+          if (lt >= delay) {
+            const progress = Math.min(1, (lt - delay) / duration);
+            const p = easeOut(progress);
+            letter.style.opacity = p;
+            letter.style.transform = 'translateY(' + (100 * (1 - p)) + '%)';
+          } else {
+            letter.style.opacity = 0;
+            letter.style.transform = 'translateY(100%)';
+          }
+        });
+
+        // Tagline
+        const tagDelay = 1.0;
+        const tagDuration = 0.5;
+        if (lt >= tagDelay) {
+          const progress = Math.min(1, (lt - tagDelay) / tagDuration);
+          const p = easeOut(progress);
+          tagSmall.style.opacity = p;
+          tagSmall.style.transform = 'translateY(' + (16 * (1 - p)) + 'px)';
+        } else {
+          tagSmall.style.opacity = 0;
+          tagSmall.style.transform = 'translateY(16px)';
+        }
+      }
+    };
+
+    // Initialize
+    window.setTime(0);
+  </script>
+</body>
+</html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+    :root {
+      --brand: #0f81c0;
+      --white: #ffffff;
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      font-family: "Poppins", sans-serif;
+      background: transparent;
+    }
+
+    .stage {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    /* "Life moves fast." text */
+    .life-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+    }
+
+    .life-text.active { opacity: 1; }
+
+    .life-text h1 {
+      font-family: "Inter", sans-serif;
+      font-size: 82px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.95);
+      text-align: center;
+    }
+
+    .life-text .word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(30px);
+      filter: blur(8px);
+    }
+
+    .life-text.active .word {
+      animation: word-fade-in 0.8s var(--ease-out) forwards;
+    }
+
+    .life-text.active .word:nth-child(1) { animation-delay: 0.0s; }
+    .life-text.active .word:nth-child(2) { animation-delay: 0.15s; }
+    .life-text.active .word:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes word-fade-in {
+      to { opacity: 1; transform: translateY(0); filter: blur(0); }
+    }
+
+    .life-text.fade-out .word {
+      animation: word-fade-out 0.5s var(--ease-smooth) forwards;
+    }
+
+    @keyframes word-fade-out {
+      to { opacity: 0; transform: translateY(-20px); filter: blur(4px); }
+    }
+
+    /* Clip captions */
+    .clip-caption-layer {
+      position: absolute;
+      bottom: 80px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      opacity: 0;
+    }
+
+    .clip-caption-layer.active { opacity: 1; }
+
+    .clip-caption {
+      font-family: "Inter", sans-serif;
+      font-size: 68px;
+      font-weight: 500;
+      color: var(--white);
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .clip-caption.active {
+      animation: caption-in 0.3s var(--ease-out) forwards;
+    }
+
+    .clip-caption.exit {
+      animation: caption-out 0.25s var(--ease-smooth) forwards;
+    }
+
+    @keyframes caption-in {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes caption-out {
+      to { opacity: 0; transform: translateY(-8px); }
+    }
+
+    .clip-caption .highlight-word {
+      position: relative;
+      color: var(--white);
+      text-shadow: 0 2px 15px rgba(0,0,0,0.9), 0 1px 3px rgba(0,0,0,0.9);
+      padding: 1px 1px;
+      margin: 0 1px;
+      display: inline-block;
+    }
+
+    .clip-caption .highlight-word::before {
+      content: '';
+      position: absolute;
+      inset: -1px -1px;
+      background: #3ba3e0;
+      border-radius: 6px;
+      transform: scale(0);
+      z-index: -1;
+      transition: transform 0.2s ease-out;
+    }
+
+    .clip-caption .highlight-word.highlighted {
+      text-shadow: none;
+    }
+
+    .clip-caption .highlight-word.highlighted::before {
+      animation: box-pop-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes box-pop-in {
+      0% { transform: scale(0); }
+      70% { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+
+    /* Phase 3 captions */
+    .caption-layer {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+    }
+
+    .caption-layer.active { opacity: 1; }
+
+    .caption {
+      font-family: "Inter", sans-serif;
+      font-size: 82px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.95);
+      opacity: 0;
+      transform: translateY(20px);
+      filter: blur(6px);
+    }
+
+    .caption.active {
+      animation: caption-in-blur 0.5s var(--ease-out) forwards;
+    }
+
+    .caption.exit {
+      animation: caption-out-blur 0.4s var(--ease-smooth) forwards;
+    }
+
+    @keyframes caption-in-blur {
+      to { opacity: 1; transform: translateY(0); filter: blur(0); }
+    }
+
+    @keyframes caption-out-blur {
+      to { opacity: 0; transform: translateY(-15px); filter: blur(4px); }
+    }
+
+    /* Logo scene */
+    .logo-scene {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+    }
+
+    .logo-scene.active { opacity: 1; }
+
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .logo-lockup {
+      display: flex;
+      align-items: center;
+      gap: 34px;
+    }
+
+    .logo-icon {
+      width: 153px;
+      height: 153px;
+      opacity: 0;
+      transform: translateX(-50px) rotate(-20deg) scale(0.6);
+    }
+
+    .logo-icon img {
+      width: 100%;
+      height: 100%;
+      border-radius: 34px;
+      transform: scale(1.2);
+    }
+
+    .logo-scene.active .logo-icon {
+      animation: icon-swoop 0.7s var(--ease-out) forwards;
+    }
+
+    @keyframes icon-swoop {
+      60% { opacity: 1; transform: translateX(0) rotate(4deg) scale(1.05); }
+      100% { opacity: 1; transform: translateX(0) rotate(0) scale(1); }
+    }
+
+    .wordmark {
+      font-family: "Poppins", sans-serif;
+      font-size: 122px;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: -0.02em;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .wordmark .letter {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(100%);
+    }
+
+    .logo-scene.active .wordmark .letter {
+      animation: letter-up 0.35s var(--ease-out) forwards;
+    }
+
+    .logo-scene.active .wordmark .letter:nth-child(1) { animation-delay: 0.35s; }
+    .logo-scene.active .wordmark .letter:nth-child(2) { animation-delay: 0.38s; }
+    .logo-scene.active .wordmark .letter:nth-child(3) { animation-delay: 0.41s; }
+    .logo-scene.active .wordmark .letter:nth-child(4) { animation-delay: 0.44s; }
+    .logo-scene.active .wordmark .letter:nth-child(5) { animation-delay: 0.47s; }
+    .logo-scene.active .wordmark .letter:nth-child(6) { animation-delay: 0.50s; }
+    .logo-scene.active .wordmark .letter:nth-child(7) { animation-delay: 0.53s; }
+    .logo-scene.active .wordmark .letter:nth-child(8) { animation-delay: 0.56s; }
+    .logo-scene.active .wordmark .letter:nth-child(9) { animation-delay: 0.59s; }
+
+    @keyframes letter-up {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .tagline {
+      font-family: "Poppins", sans-serif;
+      margin-top: -6px;
+      padding-left: 189px;
+      font-size: 41px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.7);
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .logo-scene.active .tagline {
+      animation: tag-in 0.5s var(--ease-out) 0.9s forwards;
+    }
+
+    @keyframes tag-in {
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="clip-caption-layer" id="clipCaptionLayer">
+      <p class="clip-caption" id="clipCaption"></p>
+    </div>
+
+    <div class="life-text" id="lifeText">
+      <h1>
+        <span class="word">Life</span>
+        <span class="word">moves</span>
+        <span class="word">fast.</span>
+      </h1>
+    </div>
+
+    <div class="caption-layer" id="captionLayer">
+      <p class="caption" id="caption"></p>
+    </div>
+
+    <div class="logo-scene" id="logoScene">
+      <div class="logo-container">
+        <div class="logo-lockup">
+          <div class="logo-icon">
+            <img src="../assets/logo-icon-white.svg" alt="BidMyRoom">
+          </div>
+          <div class="wordmark">
+            <span class="letter">B</span>
+            <span class="letter">i</span>
+            <span class="letter">d</span>
+            <span class="letter">M</span>
+            <span class="letter">y</span>
+            <span class="letter">R</span>
+            <span class="letter">o</span>
+            <span class="letter">o</span>
+            <span class="letter">m</span>
+          </div>
+        </div>
+        <p class="tagline">Let hotels come to you</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const clipCaptionLayer = document.getElementById('clipCaptionLayer');
+    const clipCaption = document.getElementById('clipCaption');
+    const lifeText = document.getElementById('lifeText');
+    const captionLayer = document.getElementById('captionLayer');
+    const caption = document.getElementById('caption');
+    const logoScene = document.getElementById('logoScene');
+
+    // Clip duration total: ~6.96s
+    const CLIPS_END = 6.96;
+    const AUDIO_PAUSE = 7.5;
+    const LIFE_TEXT_END = 10.0;
+    const AUDIO_RESUME = 7.32;
+    const AUDIO_END = 14.46;
+
+    const clipCaptions = [
+      {
+        start: 0.0, end: 2.3,
+        words: [
+          { text: "Life", highlightAt: 0.0 },
+          { text: "is", highlightAt: 0.36 },
+          { text: "made", highlightAt: 0.72 },
+          { text: "of", highlightAt: 0.94 },
+          { text: "moments", highlightAt: 1.12 },
+          { text: "that", highlightAt: 1.40 },
+          { text: "matter", highlightAt: 1.68 }
+        ],
+        separator: " "
+      },
+      { start: 2.5, end: 3.5, text: "childhood", highlight: true },
+      { start: 3.6, end: 4.4, text: "growing up", highlight: true },
+      { start: 4.5, end: 5.4, text: "college", highlight: true },
+      { start: 5.5, end: 6.0, text: "marriage", highlight: true },
+      { start: 6.35, end: 7.2, text: "grandkids", highlight: true },
+    ];
+
+    const captions = [
+      { audioStart: 7.32, audioEnd: 8.66, text: "and booking a hotel" },
+      { audioStart: 8.66, audioEnd: 10.18, text: "shouldn't take you away from them." },
+      { audioStart: 10.86, audioEnd: 12.30, text: "Post your stay on BidMyRoom" },
+      { audioStart: 12.98, audioEnd: 14.46, text: "and let hotels bid for you." },
+    ];
+
+    let triggered = {};
+
+    window.setTime = function(t) {
+      // Phase 1: Clip captions (0 to ~7s)
+      if (t < CLIPS_END) {
+        if (!triggered.clipCaptions) {
+          triggered.clipCaptions = true;
+          clipCaptionLayer.classList.add('active');
+        }
+        updateClipCaptions(t);
+      }
+      // Phase 2: Life moves fast (7 to 10s)
+      else if (t < LIFE_TEXT_END) {
+        if (!triggered.clipCaptionsHide) {
+          triggered.clipCaptionsHide = true;
+          clipCaptionLayer.classList.remove('active');
+        }
+
+        if (t >= AUDIO_PAUSE && !triggered.lifeText) {
+          triggered.lifeText = true;
+          lifeText.classList.add('active');
+        }
+
+        if (t > LIFE_TEXT_END - 0.5 && !triggered.lifeTextOut) {
+          triggered.lifeTextOut = true;
+          lifeText.classList.add('fade-out');
+        }
+      }
+      // Phase 3: Captions (10s to ~17s)
+      else if (t < LIFE_TEXT_END + (AUDIO_END - AUDIO_RESUME)) {
+        if (!triggered.lifeTextHide) {
+          triggered.lifeTextHide = true;
+          lifeText.style.display = 'none';
+        }
+
+        if (!triggered.captionLayer) {
+          triggered.captionLayer = true;
+          captionLayer.classList.add('active');
+        }
+
+        const audioTime = AUDIO_RESUME + (t - LIFE_TEXT_END);
+        updateCaptions(audioTime);
+
+        // Logo starts near end
+        if (audioTime >= 13.5 && !triggered.logo) {
+          triggered.logo = true;
+          captionLayer.classList.remove('active');
+          logoScene.classList.add('active');
+        }
+      }
+      // Phase 4: Logo (17s+)
+      else {
+        if (!triggered.logo) {
+          triggered.logo = true;
+          captionLayer.classList.remove('active');
+          logoScene.classList.add('active');
+        }
+      }
+    };
+
+    function updateClipCaptions(adTime) {
+      let found = false;
+      let currentCapId = clipCaption.dataset.capId;
+
+      for (let i = 0; i < clipCaptions.length; i++) {
+        const cap = clipCaptions[i];
+        if (adTime >= cap.start && adTime < cap.end) {
+          found = true;
+
+          if (currentCapId !== String(i)) {
+            clipCaption.classList.remove('active', 'exit');
+            void clipCaption.offsetWidth;
+            clipCaption.dataset.capId = String(i);
+
+            if (cap.words) {
+              const sep = cap.separator !== undefined ? cap.separator : ', ';
+              const html = cap.words.map((w, idx) => {
+                const separator = idx < cap.words.length - 1 ? sep : '';
+                return `<span class="highlight-word" data-highlight="${w.highlightAt}">${w.text}</span>${separator}`;
+              }).join('');
+              clipCaption.innerHTML = html;
+            } else if (cap.highlight) {
+              clipCaption.innerHTML = `<span class="highlight-word highlighted">${cap.text}</span>`;
+            } else {
+              clipCaption.innerHTML = cap.text;
+            }
+
+            clipCaption.classList.add('active');
+          }
+
+          // Update highlights - only one at a time
+          const highlightWords = clipCaption.querySelectorAll('.highlight-word[data-highlight]');
+          let activeWord = null;
+          highlightWords.forEach(word => {
+            const highlightAt = parseFloat(word.dataset.highlight);
+            if (adTime >= highlightAt) activeWord = word;
+          });
+          highlightWords.forEach(word => {
+            if (word === activeWord) word.classList.add('highlighted');
+            else word.classList.remove('highlighted');
+          });
+
+          break;
+        }
+      }
+
+      if (!found && clipCaption.innerHTML && !clipCaption.classList.contains('exit')) {
+        clipCaption.classList.add('exit');
+        clipCaption.dataset.capId = '';
+      }
+    }
+
+    function updateCaptions(audioTime) {
+      let found = false;
+      for (const cap of captions) {
+        if (audioTime >= cap.audioStart && audioTime < cap.audioEnd) {
+          if (caption.textContent !== cap.text) {
+            caption.classList.remove('active', 'exit');
+            void caption.offsetWidth;
+            caption.textContent = cap.text;
+            caption.classList.add('active');
+          }
+          found = true;
+          break;
+        }
+      }
+      if (!found && caption.textContent && !caption.classList.contains('exit')) {
+        caption.classList.add('exit');
+      }
+    }
+  </script>
+</body>
+</html>

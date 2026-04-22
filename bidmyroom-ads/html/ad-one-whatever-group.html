@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BidMyRoom — Whatever Your Group v2</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap");
+
+      :root {
+        --brand: #0f81c0;
+        --white: #ffffff;
+        --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+        --ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+        --ease-expo: cubic-bezier(0.87, 0, 0.13, 1);
+        --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html, body {
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        font-family: "Poppins", sans-serif;
+        background: #0a0a0a;
+      }
+
+      .stage {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        margin: 0 auto;
+        transform-origin: top center;
+      }
+
+      /* Video background with blur transition */
+      .video-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 1080px;
+        height: 1920px;
+        object-fit: fill;
+        transition: filter 1s var(--ease-smooth), transform 1s var(--ease-smooth);
+      }
+
+      .video-bg.blur {
+        filter: blur(25px) brightness(0.7);
+        transform: scale(1.08);
+      }
+
+      /* Dark overlay for logo scene (instead of solid background) */
+      .dark-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        transition: opacity 1s var(--ease-smooth);
+      }
+
+      .dark-overlay.active {
+        opacity: 1;
+      }
+
+      /* Vignette */
+      .vignette {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.5) 100%);
+        opacity: 0;
+        transition: opacity 0.8s var(--ease-smooth);
+      }
+
+      .vignette.active { opacity: 1; }
+
+      /* ============ SCENE SYSTEM ============ */
+      .scene {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .scene.active { opacity: 1; }
+
+      /* ============ SCENE 1: "Whatever your group looks like..." - CENTER ============ */
+      #scene-1 {
+        justify-content: center;
+        padding-bottom: 100px;
+      }
+
+      .headline-top {
+        font-size: 64px;
+        font-weight: 700;
+        line-height: 1.2;
+        text-align: center;
+        color: var(--white);
+        padding: 0 60px;
+        text-shadow: 0 4px 30px rgba(0,0,0,0.8), 0 2px 10px rgba(0,0,0,0.9);
+      }
+
+      /* Masked slide-up animation */
+      .headline-top .word {
+        display: inline-block;
+        overflow: hidden;
+        vertical-align: bottom;
+        padding-bottom: 0.12em;
+        margin-bottom: -0.12em;
+      }
+
+      .headline-top .word .inner {
+        display: inline-block;
+        transform: translateY(115%);
+        opacity: 0;
+      }
+
+      #scene-1.active .headline-top .word .inner {
+        animation: line-rise 0.8s var(--ease-out) forwards;
+      }
+
+      #scene-1.active .headline-top .word:nth-of-type(1) .inner { animation-delay: 0.0s; }
+      #scene-1.active .headline-top .word:nth-of-type(2) .inner { animation-delay: 0.08s; }
+      #scene-1.active .headline-top .word:nth-of-type(3) .inner { animation-delay: 0.16s; }
+      #scene-1.active .headline-top .word:nth-of-type(4) .inner { animation-delay: 0.24s; }
+      #scene-1.active .headline-top .word:nth-of-type(5) .inner { animation-delay: 0.32s; }
+
+      @keyframes line-rise {
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      /* Iris close exit */
+      #scene-1.iris-close {
+        animation: iris-close 0.6s var(--ease-expo) forwards;
+      }
+
+      @keyframes iris-close {
+        0% { clip-path: circle(120% at 50% 50%); opacity: 1; }
+        100% { clip-path: circle(0% at 50% 50%); opacity: 1; }
+      }
+
+      /* ============ SCENE 2: "We've got your room." - CENTER ============ */
+      #scene-2 {
+        justify-content: center;
+        padding-bottom: 100px;
+      }
+
+      .subline {
+        font-size: 58px;
+        font-weight: 600;
+        color: var(--white);
+        text-align: center;
+        text-shadow: 0 4px 30px rgba(0,0,0,0.8);
+        opacity: 0;
+        transform: scale(0.9);
+        filter: blur(10px);
+      }
+
+      #scene-2.active .subline {
+        animation: zoom-blur-in 0.6s var(--ease-out) forwards;
+      }
+
+      @keyframes zoom-blur-in {
+        to {
+          opacity: 1;
+          transform: scale(1);
+          filter: blur(0);
+        }
+      }
+
+      #scene-2.zoom-out .subline {
+        animation: zoom-blur-out 0.5s var(--ease-expo) forwards;
+      }
+
+      @keyframes zoom-blur-out {
+        to {
+          opacity: 0;
+          transform: scale(1.4);
+          filter: blur(12px);
+        }
+      }
+
+      /* ============ SCENE 3: "Room?" - Letter drop + ? punch ============ */
+      #scene-3 {
+        justify-content: center;
+        padding-bottom: 80px;
+      }
+
+      .room-q {
+        font-size: 180px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: var(--white);
+        display: inline-flex;
+        align-items: baseline;
+        text-shadow: 0 6px 40px rgba(0,0,0,0.7);
+      }
+
+      .room-q .rl {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(-110%) scale(1.1);
+        transform-origin: center bottom;
+      }
+
+      #scene-3.active .room-q .rl {
+        animation: letter-drop 0.55s var(--ease-back) forwards;
+      }
+
+      #scene-3.active .room-q .rl:nth-child(1) { animation-delay: 0.0s; }
+      #scene-3.active .room-q .rl:nth-child(2) { animation-delay: 0.05s; }
+      #scene-3.active .room-q .rl:nth-child(3) { animation-delay: 0.10s; }
+      #scene-3.active .room-q .rl:nth-child(4) { animation-delay: 0.15s; }
+
+      @keyframes letter-drop {
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      .room-q .qmark {
+        display: inline-block;
+        opacity: 0;
+        transform: scale(0.3) rotate(-20deg);
+        transform-origin: center 70%;
+        margin-left: 0.02em;
+      }
+
+      #scene-3.active .room-q .qmark {
+        animation: qmark-punch 0.5s var(--ease-back) 0.25s forwards;
+      }
+
+      @keyframes qmark-punch {
+        to {
+          opacity: 1;
+          transform: scale(1) rotate(0);
+        }
+      }
+
+      #scene-3.zoom-out .room-q {
+        animation: zoom-blur-out 0.5s var(--ease-expo) forwards;
+      }
+
+      /* ============ SCENE 4: Logo Lockup (on blurred video) ============ */
+      #scene-4 {
+        justify-content: center;
+        padding-bottom: 60px;
+        transform: scale(1.03);
+        transition: transform 0.7s var(--ease-out);
+      }
+
+      #scene-4.active {
+        transform: scale(1);
+      }
+
+      .lockup {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+      }
+
+      .logo-icon {
+        width: 120px;
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transform: translateX(-80px) rotate(-25deg) scale(0.6);
+        filter: drop-shadow(0 15px 40px rgba(0,0,0,0.4));
+      }
+
+      .logo-icon img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        border-radius: 26px;
+      }
+
+      #scene-4.active .logo-icon {
+        animation: icon-swoop 0.75s var(--ease-out) forwards;
+      }
+
+      @keyframes icon-swoop {
+        65% {
+          opacity: 1;
+          transform: translateX(0) rotate(4deg) scale(1.08);
+        }
+        100% {
+          opacity: 1;
+          transform: translateX(0) rotate(0) scale(1);
+        }
+      }
+
+      .wordmark {
+        font-size: 80px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--white);
+        display: flex;
+        overflow: hidden;
+        text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      }
+
+      .wordmark .letter {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(100%);
+      }
+
+      #scene-4.active .wordmark .letter {
+        animation: letter-in 0.4s var(--ease-out) forwards;
+      }
+
+      #scene-4.active .wordmark .letter:nth-child(1) { animation-delay: 0.4s; }
+      #scene-4.active .wordmark .letter:nth-child(2) { animation-delay: 0.45s; }
+      #scene-4.active .wordmark .letter:nth-child(3) { animation-delay: 0.5s; }
+      #scene-4.active .wordmark .letter:nth-child(4) { animation-delay: 0.55s; }
+      #scene-4.active .wordmark .letter:nth-child(5) { animation-delay: 0.6s; }
+      #scene-4.active .wordmark .letter:nth-child(6) { animation-delay: 0.65s; }
+      #scene-4.active .wordmark .letter:nth-child(7) { animation-delay: 0.7s; }
+      #scene-4.active .wordmark .letter:nth-child(8) { animation-delay: 0.75s; }
+      #scene-4.active .wordmark .letter:nth-child(9) { animation-delay: 0.8s; }
+
+      @keyframes letter-in {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .tag-small {
+        margin-top: 28px;
+        font-size: 24px;
+        font-weight: 500;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.75);
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      #scene-4.active .tag-small {
+        animation: tag-in 0.5s var(--ease-out) 1s forwards;
+      }
+
+      @keyframes tag-in {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ============ CONTROLS ============ */
+      .controls {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        background: rgba(0,0,0,0.9);
+        padding: 16px 20px;
+        border-radius: 12px;
+        color: white;
+        font-family: monospace;
+        font-size: 13px;
+        border: 1px solid rgba(255,255,255,0.1);
+      }
+      .controls button {
+        background: var(--brand);
+        color: white;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-right: 8px;
+        font-size: 13px;
+      }
+      .controls button:hover { background: #0a6da8; }
+      .time-display { margin-top: 12px; font-size: 18px; }
+      .export-info { margin-top: 6px; font-size: 11px; color: #666; }
+    </style>
+  </head>
+  <body>
+    <div class="controls">
+      <button onclick="restartVideo()">Restart</button>
+      <button onclick="skipToText()">Skip to 10s</button>
+      <div class="time-display">Time: <span id="time">0.00</span>s</div>
+      <div class="export-info">1080x1920 (9:16)</div>
+    </div>
+
+    <div class="stage">
+      <video class="video-bg" id="video" muted playsinline>
+        <source src="../un-edited-videos/ad-one-whatever-group.mp4" type="video/mp4" />
+      </video>
+
+      <div class="dark-overlay" id="darkOverlay"></div>
+      <div class="vignette" id="vignette"></div>
+
+      <!-- Scene 1: "Whatever your group looks like..." - TOP -->
+      <div class="scene" id="scene-1">
+        <h1 class="headline-top">
+          <span class="word"><span class="inner">Whatever</span></span>&nbsp;
+          <span class="word"><span class="inner">your</span></span>&nbsp;
+          <span class="word"><span class="inner" style="color: #0f81c0; text-shadow: none;">group</span></span><br>
+          <span class="word"><span class="inner">looks</span></span>&nbsp;
+          <span class="word"><span class="inner">like...</span></span>
+        </h1>
+      </div>
+
+      <!-- Scene 3: "Room?" - Letter drop + ? punch -->
+      <div class="scene" id="scene-3">
+        <h1 class="room-q">
+          <span class="rl">R</span><span class="rl">o</span><span class="rl">o</span><span class="rl">m</span><span class="qmark" style="color: #0f81c0; text-shadow: none;">?</span>
+        </h1>
+      </div>
+
+      <!-- Scene 4: Logo Lockup -->
+      <div class="scene" id="scene-4">
+        <div class="lockup">
+          <div class="logo-icon">
+            <img src="../assets/logo-icon.svg" alt="BidMyRoom" />
+          </div>
+          <div class="wordmark">
+            <span class="letter">B</span>
+            <span class="letter">i</span>
+            <span class="letter">d</span>
+            <span class="letter">M</span>
+            <span class="letter">y</span>
+            <span class="letter">R</span>
+            <span class="letter">o</span>
+            <span class="letter">o</span>
+            <span class="letter">m</span>
+          </div>
+        </div>
+        <p class="tag-small">For Every Traveler, Every Trip</p>
+      </div>
+    </div>
+
+    <script>
+      const video = document.getElementById("video");
+      const vignette = document.getElementById("vignette");
+      const darkOverlay = document.getElementById("darkOverlay");
+      const scene1 = document.getElementById("scene-1");
+      const scene3 = document.getElementById("scene-3");
+      const scene4 = document.getElementById("scene-4");
+      const timeDisplay = document.getElementById("time");
+
+      // ============ TIMING CONFIG (slowed ~8%) ============
+      const T = {
+        vignetteIn: 10.0,
+        scene1In: 10.3,       // "Whatever your group looks like..." CENTER
+        scene1Out: 12.3,      // Iris close (longer hold)
+        // scene2 removed
+        scene3In: 12.5,       // "Room?" letter drop
+        scene3Out: 13.6,      // Zoom out (longer hold)
+        blurIn: 13.4,         // Video blur + dark overlay
+        scene4In: 13.8,       // Logo
+      };
+
+      let triggered = {};
+
+      function resetAll() {
+        triggered = {};
+        video.classList.remove("blur");
+        vignette.classList.remove("active");
+        darkOverlay.classList.remove("active");
+        [scene1, scene3, scene4].forEach(s => {
+          s.style.opacity = "0";
+          s.classList.remove("active", "iris-close", "zoom-out");
+        });
+      }
+
+      function restartVideo() {
+        resetAll();
+        video.currentTime = 0;
+        video.play();
+      }
+
+      function skipToText() {
+        resetAll();
+        video.currentTime = T.vignetteIn - 0.3;
+        video.play();
+      }
+
+      video.addEventListener("timeupdate", () => {
+        const t = video.currentTime;
+        timeDisplay.textContent = t.toFixed(2);
+
+        // Vignette
+        if (t >= T.vignetteIn && !triggered.vig) {
+          triggered.vig = true;
+          vignette.classList.add("active");
+        }
+
+        // Scene 1
+        if (t >= T.scene1In && !triggered.s1in) {
+          triggered.s1in = true;
+          scene1.style.opacity = "1";
+          scene1.classList.add("active");
+        }
+        if (t >= T.scene1Out && !triggered.s1out) {
+          triggered.s1out = true;
+          scene1.classList.add("iris-close");
+        }
+
+        // Scene 3 (scene 2 removed)
+        if (t >= T.scene3In && !triggered.s3in) {
+          triggered.s3in = true;
+          scene3.style.opacity = "1";
+          scene3.classList.add("active");
+        }
+        if (t >= T.scene3Out && !triggered.s3out) {
+          triggered.s3out = true;
+          scene3.classList.add("zoom-out");
+        }
+
+        // Blur video + dark overlay for logo
+        if (t >= T.blurIn && !triggered.blur) {
+          triggered.blur = true;
+          video.classList.add("blur");
+          darkOverlay.classList.add("active");
+        }
+
+        // Scene 4
+        if (t >= T.scene4In && !triggered.s4in) {
+          triggered.s4in = true;
+          scene4.style.opacity = "1";
+          scene4.classList.add("active");
+        }
+      });
+
+      video.addEventListener("loadeddata", () => video.play());
+
+      // Scale to fit viewport
+      function scaleToFit() {
+        const stage = document.querySelector('.stage');
+        const scale = Math.min((window.innerWidth - 40) / 1080, (window.innerHeight - 40) / 1920, 1);
+        stage.style.transform = `scale(${scale})`;
+      }
+      scaleToFit();
+      window.addEventListener('resize', scaleToFit);
+    </script>
+  </body>
+</html>

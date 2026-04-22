@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ad 2 - Life Journey - Clip Preview</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #1a1a1a;
+      color: white;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #888;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    video {
+      width: 100%;
+      border-radius: 8px;
+      background: #000;
+    }
+
+    .controls {
+      background: #2a2a2a;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    .time-display {
+      font-size: 48px;
+      font-weight: 700;
+      font-family: 'SF Mono', monospace;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #0f81c0;
+    }
+
+    .clip-info {
+      text-align: center;
+      font-size: 18px;
+      margin-bottom: 20px;
+      padding: 10px;
+      background: #333;
+      border-radius: 6px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background: #0f81c0;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    button:hover { background: #0a6da8; }
+    button.secondary { background: #444; }
+    button.secondary:hover { background: #555; }
+
+    .jump-buttons {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .jump-buttons button {
+      background: #333;
+      padding: 15px 10px;
+    }
+
+    .jump-buttons button:hover { background: #444; }
+    .jump-buttons button.active { background: #0f81c0; }
+
+    .scrub {
+      width: 100%;
+      margin-top: 15px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 8px;
+      -webkit-appearance: none;
+      background: #444;
+      border-radius: 4px;
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      background: #0f81c0;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .clip-markers {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+      font-size: 11px;
+      color: #666;
+    }
+
+    .instructions {
+      margin-top: 20px;
+      padding: 15px;
+      background: #222;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #888;
+      line-height: 1.6;
+    }
+
+    .instructions strong { color: #ccc; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Ad 2 — Life Journey — Clip Preview</h1>
+
+    <video id="video" playsinline>
+      <source src="../un-edited-videos/ad-two-life-journey-full-with-audio.mp4" type="video/mp4">
+    </video>
+
+    <div class="controls">
+      <div class="time-display"><span id="time">0.00</span>s</div>
+
+      <div class="clip-info">
+        Clip <span id="clipNum">1</span> of 6 | <span id="clipRange">0.00 - 5.04s</span>
+      </div>
+
+      <div class="buttons">
+        <button onclick="video.currentTime = Math.max(0, video.currentTime - 0.1)" class="secondary">-0.1s</button>
+        <button onclick="video.currentTime = Math.max(0, video.currentTime - 1)" class="secondary">-1s</button>
+        <button onclick="togglePlay()">Play / Pause</button>
+        <button onclick="video.currentTime = Math.min(video.duration, video.currentTime + 1)" class="secondary">+1s</button>
+        <button onclick="video.currentTime = Math.min(video.duration, video.currentTime + 0.1)" class="secondary">+0.1s</button>
+      </div>
+
+      <div class="jump-buttons">
+        <button onclick="jumpTo(0)" id="btn1">Clip 1<br><small>0.00s</small></button>
+        <button onclick="jumpTo(5.04)" id="btn2">Clip 2<br><small>5.04s</small></button>
+        <button onclick="jumpTo(10.08)" id="btn3">Clip 3<br><small>10.08s</small></button>
+        <button onclick="jumpTo(15.13)" id="btn4">Clip 4<br><small>15.13s</small></button>
+        <button onclick="jumpTo(20.17)" id="btn5">Clip 5<br><small>20.17s</small></button>
+        <button onclick="jumpTo(25.21)" id="btn6">Clip 6<br><small>25.21s</small></button>
+      </div>
+      <p style="text-align: center; color: #666; margin-top: 10px; font-size: 12px;">
+        All 6 clips (~5s each = 30s total) — Audio is 15.2s, so crop clips to fit (~2.5s each)
+      </p>
+
+      <div class="scrub">
+        <input type="range" id="scrubber" min="0" max="30.25" step="0.01" value="0">
+        <div class="clip-markers">
+          <span>0s</span>
+          <span>5s</span>
+          <span>10s</span>
+          <span>15s</span>
+          <span>20s</span>
+          <span>25s</span>
+          <span>30s</span>
+        </div>
+      </div>
+
+      <div class="instructions">
+        <strong>How to use:</strong><br>
+        1. Click clip buttons to jump to each clip<br>
+        2. Use +/- buttons for fine control<br>
+        3. Tell me: "Clip 1: keep 0.5s to 4.2s" etc.<br>
+        4. I'll trim and reconnect the clips
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const video = document.getElementById('video');
+    const timeDisplay = document.getElementById('time');
+    const clipNum = document.getElementById('clipNum');
+    const clipRange = document.getElementById('clipRange');
+    const scrubber = document.getElementById('scrubber');
+
+    const clipStarts = [0, 5.04, 10.08, 15.13, 20.17, 25.21];
+    const clipEnds = [5.04, 10.08, 15.13, 20.17, 25.21, 30.25];
+
+    function togglePlay() {
+      if (video.paused) video.play();
+      else video.pause();
+    }
+
+    function jumpTo(time) {
+      video.currentTime = time;
+      video.pause();
+    }
+
+    function updateClipInfo(t) {
+      for (let i = 0; i < clipStarts.length; i++) {
+        if (t >= clipStarts[i] && t < clipEnds[i]) {
+          clipNum.textContent = i + 1;
+          clipRange.textContent = `${clipStarts[i].toFixed(2)} - ${clipEnds[i].toFixed(2)}s`;
+
+          // Highlight active button
+          document.querySelectorAll('.jump-buttons button').forEach((btn, j) => {
+            btn.classList.toggle('active', i === j);
+          });
+          break;
+        }
+      }
+    }
+
+    video.addEventListener('timeupdate', () => {
+      const t = video.currentTime;
+      timeDisplay.textContent = t.toFixed(2);
+      scrubber.value = t;
+      updateClipInfo(t);
+    });
+
+    scrubber.addEventListener('input', (e) => {
+      video.currentTime = parseFloat(e.target.value);
+    });
+
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+      if (e.code === 'ArrowLeft') video.currentTime = Math.max(0, video.currentTime - 1);
+      if (e.code === 'ArrowRight') video.currentTime = Math.min(video.duration, video.currentTime + 1);
+    });
+  </script>
+</body>
+</html>
